@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { handlePostProductFish } from "@/components/api/products/fish";
+import { handlePostProductFishAPI } from "@/components/api/products/fish";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import { handleGetBreedAPI } from "@/components/api/products/breed";
 
@@ -103,7 +103,7 @@ const AddProductFishPage = () => {
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      let response = await handlePostProductFish(data);
+      let response = await handlePostProductFishAPI(data);
       if (response.status !== 200) {
         setError("Your action is failed, please try again");
         return;
@@ -282,30 +282,30 @@ const AddProductFishPage = () => {
 
           {/* Fish Model */}
           <FormField
-  control={form.control}
-  name="fishModel.breedId"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-        Breed
-      </FormLabel>
-      <FormControl>
-        <select
-          className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-          {...field}
-          defaultValue={breed ? breed[0].id : '01923e27-c8ca-7f30-b488-4b75e70d8a30'}
-        >
-          {breed?.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
+            control={form.control}
+            name="fishModel.breedId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Breed
+                </FormLabel>
+                <FormControl>
+                  <select
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    {...field}
+                  >
+                    <option>Breed</option>
+                    {breed?.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
@@ -405,6 +405,7 @@ const AddProductFishPage = () => {
                     value={field.value ? "true" : "false"}
                     onChange={(e) => field.onChange(e.target.value === "true")}
                   >
+                    <option>Sex</option>
                     <option value="true">Male</option>
                     <option value="false">Female</option>
                   </select>

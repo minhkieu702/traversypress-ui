@@ -1,6 +1,7 @@
 import { baseURL } from '@/components/config';
 import { convertImageListToBinaryStrings } from '@/components/helpers/Helpers';
 import { FishProductCreateModel } from '@/types/CreateModel/FishProductCreateModel';
+import { ProductType } from '@/types/ResponseModel/ProductType';
 import axios from 'axios'
 
 const form = async (data: FishProductCreateModel) => {
@@ -42,7 +43,7 @@ const logFormData = (formData: FormData) => {
       console.log(`${key}:`, value);
     });
   };
-export const handlePostProductFish = async (data: FishProductCreateModel) => {
+export const handlePostProductFishAPI = async (data: FishProductCreateModel) => {
     try {
     let formData = await form(data)
     var res = `${baseURL}/v1/product/fish`
@@ -52,8 +53,8 @@ export const handlePostProductFish = async (data: FishProductCreateModel) => {
     console.log(res)
     const response = await axios.post(res, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization':  `Bearer ${jwtToken}`
+          'Authorization':  `Bearer ${jwtToken}`,
+   'Content-Type': 'multipart/form-data'
         }
     })
     console.log('response', response);
@@ -63,3 +64,25 @@ export const handlePostProductFish = async (data: FishProductCreateModel) => {
       throw new Error(error as string);
     }
   };
+
+  export const handleGetProductFishAPI = async (pageSize: number, pageNumber: number, search:string|null, breed:string|null, sort:string|null, direction:string|null) => {
+    try {
+      const response = await axios.get(`${baseURL}/v1/product/fishs`, {
+        params: {
+          PageSize: pageSize,
+          PageNumber: pageNumber,
+          ...(search && { Search: search }),
+          ...(breed && { Breed: breed }),
+          ...(sort && { Sort: sort }),
+          ...(direction && { Direction: direction }),
+        },
+      });
+      console.log("response", response);
+      console.log("data", response.data);
+      console.log("fishes response", response.data as ProductType[]);
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.error("Error fetching fish products:", error);
+    }
+  }
