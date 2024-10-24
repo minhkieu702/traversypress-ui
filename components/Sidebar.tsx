@@ -32,6 +32,10 @@ const Sidebar = () => {
           </CommandItem>
           <CommandItem>
             <Newspaper className='mr-2 h-4 w-4' />
+            <Link href='/fish'>Fish Products</Link>
+          </CommandItem>
+          <CommandItem>
+            <Newspaper className='mr-2 h-4 w-4' />
             <Link href='/posts'>Posts</Link>
           </CommandItem>
           <CommandItem>

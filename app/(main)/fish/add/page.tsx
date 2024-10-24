@@ -27,11 +27,11 @@ const formSchema = z.object({
   descriptionDetail: z.string().optional(), // Mô tả chi tiết, có thể không bắt buộc
   stockQuantity: z.preprocess(
     (val) => Number(val),
-    z.number().min(0, "Stock must be a positive number")
+    z.number().min(1, "Stock must be a positive number")
   ), // chuyển chuỗi thành số
   price: z.preprocess(
     (val) => Number(val),
-    z.number().positive("Price must be greater than 0")
+    z.number().min(1).positive("Price must be greater than 0")
   ),
   originalPrice: z.preprocess(
     (val) => (val === "" ? undefined : Number(val)),
