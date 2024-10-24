@@ -37,7 +37,7 @@ const PostsTable = ({ limit, title }: PostsTableProps) => {
             <TableHead className='hidden md:table-cell text-right'>
               Date
             </TableHead>
-            <TableHead>View</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
