@@ -14,12 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { handlePostProductFishAPI } from "@/components/api/products/fish";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import { handleGetBreedAPI } from "@/components/api/products/breed";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
@@ -74,6 +74,8 @@ const formSchema = z.object({
 
 const AddProductFishPage = () => {
   const router = useRouter();
+  const { toast } = useToast();
+
   const [breed, setBreed] = useState<BreedType[]>();
 
   const [error, setError] = useState<string>("");
@@ -348,28 +350,7 @@ const AddProductFishPage = () => {
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name="fishModel.origin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Origin
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    placeholder="Enter Origin"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+          
           <FormField
             control={form.control}
             name="fishModel.origin"

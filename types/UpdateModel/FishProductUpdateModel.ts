@@ -8,6 +8,6 @@ export interface FishProductUpdateModel {
     price?: number | null; // Assuming double means number
     originalPrice?: number | null; // Assuming double means number
     deleteImages?: (string | null)[] | null; // Assuming UUID format for image identifiers
-    updateImages?: (string | null)[] | null; // Assuming binary data represented as string
+    updateImages?: (File)[] | null; // Assuming binary data represented as string
     fishModel?: FishUpdateRequestModel | null; // Optional and nullable
   };

@@ -1,17 +1,525 @@
-'use client'
-import BackButton from "@/components/BackButton"
+"use client";
+import { handleGetBreedAPI } from "@/components/api/products/breed";
+import {
+  handleGetProductFishByIdAPI,
+  hanldePatchProductFishAPI,
+} from "@/components/api/products/fish";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import BackButton from "@/components/BackButton";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { BreedType } from "@/types/ResponseModel/BreedType";
 import { FishType } from "@/types/ResponseModel/FishType";
-import { useState } from "react";
+import { ProductType } from "@/types/ResponseModel/ProductType";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
+import { Textarea } from "@/components/ui/textarea";
 
-const FishPage = () => {
-    const [fish, setFish] = useState<FishType>();
-    
-    return(
-        <>
-        <BackButton text='Go Back' link='/' />
-        
-        </>
-    )
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  descriptionDetail: z.string(),
+  stockQuantity: z.preprocess(
+    (val) => Number(val),
+    z.number().min(1, "Stock must be a positive number")
+  ),
+  price: z.preprocess(
+    (val) => Number(val),
+    z.number().min(1).positive("Price must be greater than original price")
+  ),
+  originalPrice: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z.number().positive()
+  ),
+  deleteImages: z.array(z.string().uuid()).optional(),
+  updateImages: z.array(z.any()).optional(),
+  fishModel: z.object({
+    breedId: z.string().min(1, "Breed ID is required"),
+    size: z.preprocess(
+      (val) => Number(val),
+      z.number().positive("Size must be greater than 0")
+    ),
+    age: z.preprocess(
+      (val) => Number(val),
+      z.number().min(0, "Age must be a positive number")
+    ),
+    origin: z.string().min(1, "Origin is required"),
+    sex: z.boolean(),
+    foodAmount: z.preprocess(
+      (val) => Number(val),
+      z.number().positive("Food amount must be positive")
+    ),
+    weight: z.preprocess(
+      (val) => Number(val),
+      z.number().positive("Weight must be positive")
+    ),
+    health: z.string().min(1, "Health status is required"),
+  }),
+});
+
+interface EditFishProductPageProps {
+  params: {
+    id: string;
+  };
 }
 
-export default FishPage
+const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [breed, setBreed] = useState<BreedType[]>();
+  const [error, setError] = useState("");
+  const [fish, setFish] = useState<ProductType>();
+  const [deleteImages, setDeleteImages] = useState<string[]>([]);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+  const { setValue } = form;
+
+  const handleGetBreed = async () => {
+    try {
+      let response = await handleGetBreedAPI();
+      console.log(response);
+      if (response.status === 200) {
+        setBreed(response.data as BreedType[]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleGetProductFish = async (id: string) => {
+    try {
+      let response = await handleGetProductFishByIdAPI(id);
+      console.log(response);
+      if (response.status === 200) {
+        setFish(response.data.data as ProductType);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetBreed();
+    handleGetProductFish(params.id);
+  }, []);
+
+  useEffect(() => {
+    if (fish) {
+      if (fish.name) setValue("name", fish.name);
+      if (fish.description) setValue("description", fish.description);
+      if (fish.description_detail) setValue("descriptionDetail", fish.description_detail);
+      if (fish.stock_quantity) setValue("stockQuantity", fish.stock_quantity);
+      if (fish.price) setValue("price", fish.price);
+      if (fish.original_price) setValue("originalPrice", fish.original_price);
+      if (fish.fish) {
+        if (fish.fish.breed.id) setValue("fishModel.breedId", fish.fish.breed.id);
+        if (fish.fish.size) setValue("fishModel.size", fish.fish.size);
+        if (fish.fish.age) setValue("fishModel.age", fish.fish.age);
+        if (fish.fish.origin) setValue("fishModel.origin", fish.fish.origin);
+        if (fish.fish.sex !== undefined) setValue("fishModel.sex", fish.fish.sex);
+        if (fish.fish.food_amount) setValue("fishModel.foodAmount", fish.fish.food_amount);
+        if (fish.fish.weight) setValue("fishModel.weight", fish.fish.weight);
+        if (fish.fish.health) setValue("fishModel.health", fish.fish.health);
+      }
+    }
+  }, [fish]);
+
+  const toggleDeleteImage = (imageId: string) => {
+    setDeleteImages((prev) =>
+      prev.includes(imageId)
+        ? prev.filter((id) => id !== imageId)
+        : [...prev, imageId]
+    );
+  };
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      let response = await hanldePatchProductFishAPI(params.id, data);
+      if (response.status === 200) {
+        router.push("/fish");
+      }
+    } catch (error) {
+      // Handle error if needed
+    }
+  };
+
+  return (
+    <>
+      <BackButton text="Go Back" link="/" />
+      <h3 className="text-2xl mb-4">Edit Fish Product</h3>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Name */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Name"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Description"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Description Detail */}
+          <FormField
+            control={form.control}
+            name="descriptionDetail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Description Detail
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Detailed Description"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Stock Quantity */}
+          <FormField
+            control={form.control}
+            name="stockQuantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Stock Quantity
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Stock Quantity"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Price */}
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Price
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Price"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Original Price */}
+          <FormField
+            control={form.control}
+            name="originalPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Original Price
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Original Price"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid grid-cols-3 gap-4">
+            {fish && fish.images && fish?.images.map((image) => (
+              <div key={image.id} className="relative">
+                <img
+                  src={image.link}
+                  alt={`Image ${image.id}`}
+                  className="w-full h-auto"
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleDeleteImage(image.id)}
+                  className={`absolute top-2 right-2 p-1 rounded ${
+                    deleteImages.includes(image.id)
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  } text-white`}
+                >
+                  {deleteImages.includes(image.id) ? "Undo" : "Delete"}
+                </button>
+              </div>
+            ))}
+          </div>
+          {/* Image Files */}
+          <FormField
+            control={form.control}
+            name="updateImages"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Image Files
+                </FormLabel>
+                <FormControl>
+                  <input
+                    type="file"
+                    multiple
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []); // Convert FileList to array
+                      field.onChange(files); // Pass files array to the form state
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Fish Model */}
+          <FormField
+            control={form.control}
+            name="fishModel.breedId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Breed
+                </FormLabel>
+                <FormControl>
+                  <select
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    {...field}
+                  >
+                    <option>Breed</option>
+                    {breed?.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.size"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Size
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Size"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.age"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Age
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Age"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.origin"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Origin
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Origin"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.sex"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Sex
+                </FormLabel>
+                <FormControl>
+                  <select
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    {...field}
+                    value={field.value ? "true" : "false"}
+                    onChange={(e) => field.onChange(e.target.value === "true")}
+                  >
+                    <option>Sex</option>
+                    <option value="true">Male</option>
+                    <option value="false">Female</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.foodAmount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Food Amount (grams/day)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Food Amount in grams/day"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Weight (kg)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Weight in kg"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fishModel.health"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Health Status
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    placeholder="Enter Health Status"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full">
+            Submit
+          </Button>
+        </form>
+      </Form>
+    </>
+  );
+};
+
+export default EditFishProductPage;
