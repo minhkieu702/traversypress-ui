@@ -22,7 +22,7 @@ import { ProductType } from "@/types/ResponseModel/ProductType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -55,7 +55,7 @@ const formSchema = z.object({
       z.number().min(0, "Age must be a positive number")
     ),
     origin: z.string().min(1, "Origin is required"),
-    sex: z.enum(["male", "female"]),
+    sex: z.string(),
     foodAmount: z.preprocess(
       (val) => Number(val),
       z.number().positive("Food amount must be positive")
@@ -65,6 +65,17 @@ const formSchema = z.object({
       z.number().positive("Weight must be positive")
     ),
     health: z.string().min(1, "Health status is required"),
+    deleteAward: z.array(z.string().uuid()).optional(),
+    fishAward: z
+      .array(
+        z.object({
+          id: z.string().nullable(),
+          name: z.string().min(1, "Award name is required"),
+          description: z.string().optional(),
+          awardDate: z.string().min(1, "Award date is required"),
+        })
+      )
+      .optional(),
   }),
 });
 
@@ -81,9 +92,15 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const [error, setError] = useState("");
   const [fish, setFish] = useState<ProductType | null>(null);
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
+  const [deleteAward, setDeleteAward] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "fishModel.fishAward",
   });
 
   const { setValue } = form;
@@ -91,7 +108,6 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const handleGetBreed = async () => {
     try {
       let response = await handleGetBreedAPI();
-      console.log(response);
       if (response.status === 200) {
         setBreed(response.data as BreedType[]);
       }
@@ -103,10 +119,18 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const handleGetProductFish = async (id: string) => {
     try {
       let response = await handleGetProductFishByIdAPI(id);
-      console.log(response);
       if (response.status === 200) {
-        console.log(response);
         setFish(response.data.data as ProductType);
+        // Populate initial awards for editing
+        const awards = response.data.data.fish?.awards.map((award: any) => ({
+          id: award.id,
+          name: award.name,
+          description: award.description,
+          awardDate: award.award_date,
+        }));
+        console.log(awards);
+        
+        setValue("fishModel.fishAward", awards || []);
       }
     } catch (error) {
       console.log(error);
@@ -128,12 +152,14 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
       if (fish.price) setValue("price", fish.price);
       if (fish.original_price) setValue("originalPrice", fish.original_price);
       if (fish.fish) {
-        if (fish.fish.breed.id) setValue("fishModel.breedId", fish.fish.breed.id);
+        if (fish.fish.breed.id)
+          setValue("fishModel.breedId", fish.fish.breed.id);
         if (fish.fish.size) setValue("fishModel.size", fish.fish.size);
         if (fish.fish.age) setValue("fishModel.age", fish.fish.age);
         if (fish.fish.origin) setValue("fishModel.origin", fish.fish.origin);
         if (fish.fish.sex) setValue("fishModel.sex", fish.fish.sex);
-        if (fish.fish.food_amount) setValue("fishModel.foodAmount", fish.fish.food_amount);
+        if (fish.fish.food_amount)
+          setValue("fishModel.foodAmount", fish.fish.food_amount);
         if (fish.fish.weight) setValue("fishModel.weight", fish.fish.weight);
         if (fish.fish.health) setValue("fishModel.health", fish.fish.health);
       }
@@ -148,11 +174,34 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     );
   };
 
+  const handleRemoveAward = (index: number) => {
+    let fishAwards = form.getValues("fishModel.fishAward")
+    console.log("fishAwards", fishAwards);
+    if (fishAwards) {
+      let awardId = fishAwards[index].id
+      console.log("handleRemoveAward", awardId);
+      if (awardId) {
+        setDeleteAward((prev) => [...prev, awardId])
+      }
+    }
+    remove(index);
+  };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const payload = { ...data, deleteImages };
-      console.log("deleteImages", deleteImages); // Debugging line
-      console.log("payload", payload); // Debugging line
+      const payload = {
+        ...data,
+        deleteImages,
+        fishModel: {
+          ...data.fishModel,
+          deleteAward,
+          fishAward:
+            data &&
+            data.fishModel &&
+            data.fishModel.fishAward &&
+            data.fishModel.fishAward.filter((award) => award.id === null || !deleteAward.includes(award.id)),
+        },
+      };
       let response = await hanldePatchProductFishAPI(params.id, payload);
       if (response.status === 200) {
         router.push("/fish");
@@ -168,8 +217,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
       <h3 className="text-2xl mb-4">Edit Fish Product</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-           {/* Name */}
-           <FormField
+{/* Name */}
+<FormField
             control={form.control}
             name="name"
             render={({ field }) => (
@@ -189,6 +238,30 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
             )}
           />
 
+          <div className="grid grid-cols-3 gap-4">
+            {fish &&
+              fish.images &&
+              fish.images.map((image) => (
+                <div key={image.id} className="relative">
+                  <img
+                    src={image.link}
+                    alt={`Image ${image.id}`}
+                    className="w-full h-auto"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => toggleDeleteImage(image.id)}
+                    className={`absolute top-2 right-2 p-1 rounded ${
+                      deleteImages.includes(image.id)
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    } text-white`}
+                  >
+                    {deleteImages.includes(image.id) ? "Undo" : "Delete"}
+                  </button>
+                </div>
+              ))}
+          </div>
           {/* Description */}
           <FormField
             control={form.control}
@@ -296,56 +369,9 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-3 gap-4">
-            {fish &&
-              fish.images &&
-              fish.images.map((image) => (
-                <div key={image.id} className="relative">
-                  <img
-                    src={image.link}
-                    alt={`Image ${image.id}`}
-                    className="w-full h-auto"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => toggleDeleteImage(image.id)}
-                    className={`absolute top-2 right-2 p-1 rounded ${
-                      deleteImages.includes(image.id)
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    } text-white`}
-                  >
-                    {deleteImages.includes(image.id) ? "Undo" : "Delete"}
-                  </button>
-                </div>
-              ))}
-          </div>
-          {/* Image Files */}
+
+          {/* Fish Model */}
           <FormField
-            control={form.control}
-            name="updateImages"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Image Files
-                </FormLabel>
-                <FormControl>
-                  <input
-                    type="file"
-                    multiple
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []); // Convert FileList to array
-                      field.onChange(files); // Pass files array to the form state
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           {/* Fish Model */}
-           <FormField
             control={form.control}
             name="fishModel.breedId"
             render={({ field }) => (
@@ -445,12 +471,10 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
                   <select
                     className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
                     {...field}
-                    value={field.value ? "true" : "false"}
-                    onChange={(e) => field.onChange(e.target.value === "true")}
                   >
                     <option>Sex</option>
-                    <option value="true">Male</option>
-                    <option value="false">Female</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
                   </select>
                 </FormControl>
                 <FormMessage />
@@ -519,9 +543,75 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Submit
-          </Button>
+          <FormItem>
+            <FormLabel>Fish Awards</FormLabel>
+            {fields.map((item, index) => (
+              <div key={item.id} className="space-y-4 mb-4">
+                {/* Award Name Field */}
+                <FormField
+                  control={form.control}
+                  name={`fishModel.fishAward.${index}.name`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Award Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter Award Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Award Description Field */}
+                <FormField
+                  control={form.control}
+                  name={`fishModel.fishAward.${index}.description`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Award Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter Award Description"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Award Date Field */}
+                <FormField
+                  control={form.control}
+                  name={`fishModel.fishAward.${index}.awardDate`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Award Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="button"
+                  onClick={() => handleRemoveAward(index)}
+                  className="text-red-500"
+                >
+                  Remove Award
+                </Button>
+              </div>
+            ))}
+            <Button
+              onClick={() => append({ id: null, name: "", awardDate: "" })}
+            >
+              Add Award
+            </Button>
+          </FormItem>
+
+          <Button type="submit">Submit</Button>
         </form>
       </Form>
     </>

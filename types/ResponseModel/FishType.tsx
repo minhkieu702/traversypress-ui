@@ -8,7 +8,7 @@ export interface FishType {
     size?: number;
     age?: number;
     origin?: string;
-    sex: 'male'|'female';
+    sex: string;
     food_amount?: number;
     weight?: number;
     health?: string;

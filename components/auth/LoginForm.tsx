@@ -60,6 +60,8 @@ const LoginForm = () => {
       return;
     }
     const decoded = jwtDecode<CustomJwtPayload>(response.data.token);
+    console.log(decoded);
+    
     if (decoded.role==="Admin") {
     localStorage.setItem("jwt", response.data.token);
     localStorage.setItem("role", decoded.role);

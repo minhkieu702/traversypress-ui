@@ -5,7 +5,10 @@ import { FishProductCreateModel } from "@/types/CreateModel/FishProductCreateMod
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { FishProductUpdateModel } from "@/types/UpdateModel/FishProductUpdateModel";
 import axios, { AxiosResponse } from "axios";
+import { Award } from "lucide-react";
+import { describe } from "node:test";
 import { string } from "zod";
+import { v4 as uuidv4 } from 'uuid';
 
 const updateForm = async (data: FishProductUpdateModel) => {
   const formData = new FormData();
@@ -34,6 +37,12 @@ const updateForm = async (data: FishProductUpdateModel) => {
   }
   if (data.fishModel) {
     let sex = data.fishModel.sex === "male";
+    let fishAward = data.fishModel.fishAward
+    fishAward?.forEach((item, index) => {
+      if (item.id === null) {
+        item.id = uuidv4()
+      }
+    })
     let fishModel = {
       breedId: data.fishModel.breedId,
       size: data.fishModel.size,
@@ -42,7 +51,9 @@ const updateForm = async (data: FishProductUpdateModel) => {
       sex: sex,
       foodAmount: data.fishModel.foodAmount,
       weight: data.fishModel.weight,
-      health: data.fishModel.health
+      health: data.fishModel.health,
+      deleteAward: data.fishModel.deleteAward,
+      fishAward: fishAward
     }
     formData.append("fishModel", JSON.stringify(fishModel));
   }
@@ -70,41 +81,36 @@ const addForm = async (data: FishProductCreateModel) => {
     });
   }
 
-  // Append fishModel fields
-  formData.append("fishModel", JSON.stringify(data.fishModel));
-  formData.append("fishModel.breedId", data.fishModel.breedId);
-  if (data.fishModel.size)
-    formData.append("fishModel.size", data.fishModel.size.toString());
-  if (data.fishModel.age)
-    formData.append("fishModel.age", data.fishModel.age.toString());
-  if (data.fishModel.origin)
-    formData.append("fishModel.origin", data.fishModel.origin);
-  formData.append("fishModel.sex", data.fishModel.sex.toString());
-  if (data.fishModel.foodAmount)
-    formData.append(
-      "fishModel.foodAmount",
-      data.fishModel.foodAmount.toString()
-    );
-  if (data.fishModel.weight)
-    formData.append("fishModel.weight", data.fishModel.weight.toString());
-  if (data.fishModel.health)
-    formData.append("fishModel.health", data.fishModel.health);
-  if (data.fishModel.dateOfBirth)
-    formData.append("fishModel.dateOfBirth", data.fishModel.dateOfBirth);
-
+  if (data.fishModel){
+    let sex = data.fishModel.sex === "male";
+    let fishModel = {
+      breedId: data.fishModel.breedId,
+      size: data.fishModel.size,
+      age: data.fishModel.age,
+      origin: data.fishModel.origin,
+      sex: sex,
+      foodAmount: data.fishModel.foodAmount,
+      weight: data.fishModel.weight,
+      health: data.fishModel.health,
+      dateOfBirth: data.fishModel.dateOfBirth
+    }
+    formData.append("fishModel", JSON.stringify(fishModel));
+  }
   // Handle fishAward array
   if (data.fishAward) {
-    data.fishAward.forEach((award, index) => {
-      if (award) {
-        formData.append("fishAward", JSON.stringify(data.fishAward));
-        if (award.name) formData.append(`fishAward[${index}].name`, award.name);
-        if (award.description)
-          formData.append(`fishAward[${index}].description`, award.description);
-        if (award.awardDate)
-          formData.append(`fishAward[${index}].awardDate`, award.awardDate);
-      }
-    });
-  }
+    // let awards = [];
+    // data.fishAward.forEach((item, index) => {
+    //   if (item) {
+    //     let award = {
+    //       name: item.name,
+    //       description: item.description,
+    //       awardDate: item.awardDate
+    //     };
+    //     awards[index] = award;
+    //   }
+    // });
+    formData.append("fishAward", JSON.stringify(data.fishAward));
+  }  
 
   return formData;
 };

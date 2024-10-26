@@ -7,7 +7,7 @@ import '@/styles/styles.scss'
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'TraversyPress',
+  title: 'Aquarium Dashboard',
   description: 'Admin dashboard',
 };
 

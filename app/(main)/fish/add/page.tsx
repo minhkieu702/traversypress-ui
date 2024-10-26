@@ -49,7 +49,7 @@ const formSchema = z.object({
       z.number().min(0, "Age must be a positive number")
     ),
     origin: z.string().min(1, "Origin is required"), // Nguồn gốc của cá
-    sex: z.boolean(), // Giới tính của cá
+    sex: z.string(), // Giới tính của cá
     foodAmount: z.preprocess(
       (val) => Number(val),
       z.number().positive("Food amount must be positive")
@@ -296,7 +296,6 @@ const AddProductFishPage = () => {
                     className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
                     {...field}
                   >
-                    <option>Breed</option>
                     {breed?.map((b) => (
                       <option key={b.id} value={b.id}>
                         {b.name}
@@ -383,12 +382,9 @@ const AddProductFishPage = () => {
                   <select
                     className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
                     {...field}
-                    value={field.value ? "true" : "false"}
-                    onChange={(e) => field.onChange(e.target.value === "true")}
                   >
-                    <option>Sex</option>
-                    <option value="true">Male</option>
-                    <option value="false">Female</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
                   </select>
                 </FormControl>
                 <FormMessage />
