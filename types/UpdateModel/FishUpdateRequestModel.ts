@@ -3,7 +3,7 @@ export interface FishUpdateRequestModel {
     size?: number | null;
     age?: number | null;
     origin?: string | null;
-    sex: boolean;
+    sex: string;
     foodAmount?: number | null;
     weight?: number | null;
     health?: string | null;

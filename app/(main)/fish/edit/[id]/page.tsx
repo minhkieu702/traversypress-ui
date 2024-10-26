@@ -1,4 +1,5 @@
 "use client";
+
 import { handleGetBreedAPI } from "@/components/api/products/breed";
 import {
   handleGetProductFishByIdAPI,
@@ -17,12 +18,11 @@ import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { BreedType } from "@/types/ResponseModel/BreedType";
-import { FishType } from "@/types/ResponseModel/FishType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -45,7 +45,7 @@ const formSchema = z.object({
   deleteImages: z.array(z.string().uuid()).optional(),
   updateImages: z.array(z.any()).optional(),
   fishModel: z.object({
-    breedId: z.string().min(1, "Breed ID is required"),
+    breedId: z.string(),
     size: z.preprocess(
       (val) => Number(val),
       z.number().positive("Size must be greater than 0")
@@ -55,7 +55,7 @@ const formSchema = z.object({
       z.number().min(0, "Age must be a positive number")
     ),
     origin: z.string().min(1, "Origin is required"),
-    sex: z.boolean(),
+    sex: z.enum(["male", "female"]),
     foodAmount: z.preprocess(
       (val) => Number(val),
       z.number().positive("Food amount must be positive")
@@ -77,14 +77,15 @@ interface EditFishProductPageProps {
 const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const { toast } = useToast();
   const router = useRouter();
-  const [breed, setBreed] = useState<BreedType[]>();
+  const [breed, setBreed] = useState<BreedType[]>([]);
   const [error, setError] = useState("");
-  const [fish, setFish] = useState<ProductType>();
+  const [fish, setFish] = useState<ProductType | null>(null);
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
+
   const { setValue } = form;
 
   const handleGetBreed = async () => {
@@ -104,6 +105,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
       let response = await handleGetProductFishByIdAPI(id);
       console.log(response);
       if (response.status === 200) {
+        console.log(response);
         setFish(response.data.data as ProductType);
       }
     } catch (error) {
@@ -120,7 +122,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     if (fish) {
       if (fish.name) setValue("name", fish.name);
       if (fish.description) setValue("description", fish.description);
-      if (fish.description_detail) setValue("descriptionDetail", fish.description_detail);
+      if (fish.description_detail)
+        setValue("descriptionDetail", fish.description_detail);
       if (fish.stock_quantity) setValue("stockQuantity", fish.stock_quantity);
       if (fish.price) setValue("price", fish.price);
       if (fish.original_price) setValue("originalPrice", fish.original_price);
@@ -129,13 +132,13 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
         if (fish.fish.size) setValue("fishModel.size", fish.fish.size);
         if (fish.fish.age) setValue("fishModel.age", fish.fish.age);
         if (fish.fish.origin) setValue("fishModel.origin", fish.fish.origin);
-        if (fish.fish.sex !== undefined) setValue("fishModel.sex", fish.fish.sex);
+        if (fish.fish.sex) setValue("fishModel.sex", fish.fish.sex);
         if (fish.fish.food_amount) setValue("fishModel.foodAmount", fish.fish.food_amount);
         if (fish.fish.weight) setValue("fishModel.weight", fish.fish.weight);
         if (fish.fish.health) setValue("fishModel.health", fish.fish.health);
       }
     }
-  }, [fish]);
+  }, [fish, setValue]);
 
   const toggleDeleteImage = (imageId: string) => {
     setDeleteImages((prev) =>
@@ -147,12 +150,15 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      let response = await hanldePatchProductFishAPI(params.id, data);
+      const payload = { ...data, deleteImages };
+      console.log("deleteImages", deleteImages); // Debugging line
+      console.log("payload", payload); // Debugging line
+      let response = await hanldePatchProductFishAPI(params.id, payload);
       if (response.status === 200) {
         router.push("/fish");
       }
     } catch (error) {
-      // Handle error if needed
+      console.error(error);
     }
   };
 
@@ -162,8 +168,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
       <h3 className="text-2xl mb-4">Edit Fish Product</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Name */}
-          <FormField
+           {/* Name */}
+           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
@@ -291,26 +297,28 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
             )}
           />
           <div className="grid grid-cols-3 gap-4">
-            {fish && fish.images && fish?.images.map((image) => (
-              <div key={image.id} className="relative">
-                <img
-                  src={image.link}
-                  alt={`Image ${image.id}`}
-                  className="w-full h-auto"
-                />
-                <button
-                  type="button"
-                  onClick={() => toggleDeleteImage(image.id)}
-                  className={`absolute top-2 right-2 p-1 rounded ${
-                    deleteImages.includes(image.id)
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  } text-white`}
-                >
-                  {deleteImages.includes(image.id) ? "Undo" : "Delete"}
-                </button>
-              </div>
-            ))}
+            {fish &&
+              fish.images &&
+              fish.images.map((image) => (
+                <div key={image.id} className="relative">
+                  <img
+                    src={image.link}
+                    alt={`Image ${image.id}`}
+                    className="w-full h-auto"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => toggleDeleteImage(image.id)}
+                    className={`absolute top-2 right-2 p-1 rounded ${
+                      deleteImages.includes(image.id)
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    } text-white`}
+                  >
+                    {deleteImages.includes(image.id) ? "Undo" : "Delete"}
+                  </button>
+                </div>
+              ))}
           </div>
           {/* Image Files */}
           <FormField
@@ -336,9 +344,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
               </FormItem>
             )}
           />
-
-          {/* Fish Model */}
-          <FormField
+           {/* Fish Model */}
+           <FormField
             control={form.control}
             name="fishModel.breedId"
             render={({ field }) => (
@@ -512,7 +519,6 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
               </FormItem>
             )}
           />
-
           <Button type="submit" className="w-full">
             Submit
           </Button>

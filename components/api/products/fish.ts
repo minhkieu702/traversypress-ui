@@ -20,9 +20,12 @@ const updateForm = async (data: FishProductUpdateModel) => {
   if (data.originalPrice)
     formData.append("originalPrice", data.originalPrice.toString());
   if (data.deleteImages) {
+    console.log("data.deleteImages", data.deleteImages);
+    
+    // formData.append(`deleteImages`, JSON.stringify(data.deleteImages))
     data.deleteImages.forEach((string, index) => {
-    if(string) formData.append(`deleteImages[${index}]`, string);
-    })
+      if (string) formData.append(`deleteImages[${index}]`, string);
+    });
   }
   if (data.updateImages) {
     data.updateImages.forEach((file, index) => {
@@ -30,27 +33,20 @@ const updateForm = async (data: FishProductUpdateModel) => {
     });
   }
   if (data.fishModel) {
-    formData.append("fishModel", JSON.stringify(data.fishModel));
-    if (data.fishModel.breedId)
-      formData.append("fishModel.breedId", data.fishModel.breedId);
-    if (data.fishModel.size)
-      formData.append("fishModel.size", data.fishModel.size.toString());
-    if (data.fishModel.age)
-      formData.append("fishModel.age", data.fishModel.age.toString());
-    if (data.fishModel.origin)
-      formData.append("fishModel.origin", data.fishModel.origin);
-    formData.append("fishModel.sex", data.fishModel.sex.toString());
-    if (data.fishModel.foodAmount)
-      formData.append(
-        "fishModel.foodAmount",
-        data.fishModel.foodAmount.toString()
-      );
-    if (data.fishModel.weight)
-      formData.append("fishModel.weight", data.fishModel.weight.toString());
-    if (data.fishModel.health)
-      formData.append("fishModel.health", data.fishModel.health);
+    let sex = data.fishModel.sex === "male";
+    let fishModel = {
+      breedId: data.fishModel.breedId,
+      size: data.fishModel.size,
+      age: data.fishModel.age,
+      origin: data.fishModel.origin,
+      sex: sex,
+      foodAmount: data.fishModel.foodAmount,
+      weight: data.fishModel.weight,
+      health: data.fishModel.health
+    }
+    formData.append("fishModel", JSON.stringify(fishModel));
   }
-  return formData
+  return formData;
 };
 
 const addForm = async (data: FishProductCreateModel) => {
