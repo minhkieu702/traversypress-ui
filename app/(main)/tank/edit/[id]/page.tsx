@@ -67,8 +67,6 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
   const [error, setError] = useState<any>();
   const [tank, setTank] = useState<ProductType | null>(null);
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
-  const [deleteCategories, setDeleteCategories] = useState<string[]>([]);
-  const [updateCategories, setUpdateCategories] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -190,9 +188,15 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
       if (response && response.status === 401) {
         router.push("/auth");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error) { 
+        console.error(error)
     }
+    
+    function isAxiosErrorResponse(response: any): response is { data: { detail: string } } {
+        return response && response.data && typeof response.data.detail === 'string'
+    }
+    
+    
   };
 
   return (

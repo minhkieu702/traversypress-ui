@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { logFormData, normalizeData } from "@/components/helpers/helpers";
+import { handleError, logFormData, normalizeData } from "@/components/helpers/helpers";
 import { TankProductCreateModel } from "@/types/CreateModel/TankProductCreateModel";
 import { TankProductUpdateModel } from "@/types/UpdateModel/TankProductUpdateModel";
 import axios, { AxiosError } from "axios";
@@ -103,7 +103,7 @@ const addForm = async (data: TankProductCreateModel) => {
       });
       return response;
     } catch (error) {
-      console.error("Error fetching tank products:", error);
+      handleError(error)
       return error as AxiosError;
     }
   };
@@ -113,7 +113,7 @@ const addForm = async (data: TankProductCreateModel) => {
       const response = await axios.get(`${baseURL}/v1/product/tank/${id}`);
       return response;
     } catch (error) {
-      console.log(error);
+      handleError(error)
       return error as AxiosError;
     }
   };
@@ -135,7 +135,7 @@ const addForm = async (data: TankProductCreateModel) => {
       });
       return response;
     } catch (error) {
-      console.log("error", error);
+      handleError(error)
       return error as AxiosError
     }
   };
@@ -158,7 +158,7 @@ const addForm = async (data: TankProductCreateModel) => {
       console.log("response", response);
       return response;
     } catch (error) {
-      console.log("error", error);
+      handleError(error)
       return error as AxiosError
     }
   };

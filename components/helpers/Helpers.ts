@@ -1,3 +1,6 @@
+import axios from "axios";
+import { toast } from "../ui/use-toast";
+
 const convertToBinaryString = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -33,4 +36,27 @@ const convertToBinaryString = async (file: File): Promise<string> => {
     }
     return data;
   };
+
+export const handleError = (error: unknown) => {
+  console.log(error);
+  
+  if (axios.isAxiosError(error)) {
+    if (error.response && error.response.data) {
+      const errorData = error.response.data.data;
+let message = ''
+      // Check if `errorData` is an array and contains error messages
+      if (Array.isArray(errorData) && errorData.length > 0) {
+        errorData.forEach((err, index) => {
+          message += err.errorMessage
+          message += "\n"
+        })
+      }
+      toast({
+        title: "Error",
+        description: message
+      })
+    }
+  }
+};
+
   

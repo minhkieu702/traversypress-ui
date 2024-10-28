@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { normalizeData } from "@/components/helpers/helpers";
+import { handleError, normalizeData } from "@/components/helpers/helpers";
 import axios from "axios";
 
 axios.interceptors.response.use(response => {
@@ -19,7 +19,7 @@ export const handleGetCategoryAPI = async () => {
     console.log("response", response);
     return response;
     } catch (error) {
-      console.log("error", error)
+      handleError(error)
       throw new Error(error as string);
     }
   };

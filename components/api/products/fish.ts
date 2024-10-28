@@ -8,7 +8,7 @@ import { Award } from "lucide-react";
 import { describe } from "node:test";
 import { any, string } from "zod";
 import { v4 as uuidv4 } from 'uuid';
-import { convertImageListToBinaryStrings, logFormData, normalizeData } from "@/components/helpers/helpers";
+import { convertImageListToBinaryStrings, handleError, logFormData, normalizeData } from "@/components/helpers/helpers";
 
 axios.interceptors.response.use(response => {
   response.data = normalizeData(response.data);
@@ -138,7 +138,7 @@ export const handlePostProductFishAPI = async (
     console.log("response", response);
     return response;
   } catch (error) {
-    console.log("error", error);
+    handleError(error)
     return error as AxiosError
   }
 };
@@ -164,7 +164,7 @@ export const handleGetProductFishAPI = async (
     });
     return response;
   } catch (error) {
-    console.error("Error fetching fish products:", error);
+    handleError(error)
     return error as AxiosError
   }
 };
@@ -174,7 +174,7 @@ export const handleGetProductFishByIdAPI = async (id: string) => {
     const response = await axios.get(`${baseURL}/v1/product/fish/${id}`);
     return response;
   } catch (error) {
-    console.log(error);
+    handleError(error)
     return error as AxiosError;
   }
 };
@@ -196,7 +196,7 @@ export const hanldePatchProductFishAPI = async (
     });
     return response;
   } catch (error) {
-    console.log("error", error);
+    handleError(error)
     return error as AxiosError
   }
 };

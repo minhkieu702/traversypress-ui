@@ -1,4 +1,5 @@
 import { baseURL } from "@/components/config";
+import { handleError } from "@/components/helpers/helpers";
 import axios from "axios"
 export const handleSignInAPI = async (data: any) => {
     try {
@@ -13,7 +14,7 @@ export const handleSignInAPI = async (data: any) => {
     console.log("response", response);
     return response;
     } catch (error) {
-      console.log("error", error)
+      handleError(error)
       throw new Error(error as string);
     }
   };
