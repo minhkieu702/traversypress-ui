@@ -25,7 +25,7 @@ import { AxiosError } from "axios";
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
   description: z.string().min(1, "Description is required"), // Mô tả
-  descriptionDetail: z.string().optional(), // Mô tả chi tiết, có thể không bắt buộc
+  descriptionDetail: z.string(), // Mô tả chi tiết, có thể không bắt buộc
   stockQuantity: z.preprocess(
     (val) => Number(val),
     z.number().min(1, "Stock must be a positive number")

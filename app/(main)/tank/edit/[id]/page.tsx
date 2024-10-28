@@ -190,13 +190,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
       }
     } catch (error) { 
         console.error(error)
-    }
-    
-    function isAxiosErrorResponse(response: any): response is { data: { detail: string } } {
-        return response && response.data && typeof response.data.detail === 'string'
-    }
-    
-    
+    }    
   };
 
   return (
@@ -469,7 +463,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
             className="checkbox-class-name"
           />
           <label className="text-black dark:text-white">
-            {cat.tank_type} - {cat.level}
+            {cat.tankType} - {cat.level}
           </label>
         </div>
       ))}
@@ -495,7 +489,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
             className="checkbox-class-name"
           />
           <label className="text-black dark:text-white">
-            {cat.tank_type} - {cat.level}
+            {cat.tankType} - {cat.level}
           </label>
         </div>
       ))}

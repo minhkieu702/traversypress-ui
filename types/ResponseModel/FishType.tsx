@@ -9,7 +9,7 @@ export interface FishType {
     age?: number;
     origin?: string;
     sex: string;
-    food_amount?: number;
+    foodAmount?: number;
     weight?: number;
     health?: string;
     date_of_birth?: string;

@@ -282,7 +282,7 @@ const AddProductFishPage = () => {
                     className="checkbox-class-name" // Apply any additional styles if needed
                   />
                   <label className="text-black dark:text-white">
-                    {cat.tank_type} - {cat.level}
+                    {cat.tankType} - {cat.level}
                   </label>
                 </div>
               ))}

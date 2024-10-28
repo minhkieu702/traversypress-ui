@@ -3,14 +3,13 @@
 "use client";
 
 import {
-    handleDeleteCategoryAPI,
-  handleGetCategoryAPI,
-  handlePatchCategoryAPI,
-  handlePostCategoryAPI,
-} from "@/components/api/products/category";
+  handleGetBreedAPI,
+  handlePutBreedAPI,
+  handlePostBreedAPI,
+} from "@/components/api/products/breed";
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
-import { CategoryType } from "@/types/ResponseModel/CategoryType";
+import { BreedType } from "@/types/ResponseModel/BreedType";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -36,10 +35,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AxiosError, AxiosResponse } from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 const formSchema = z.object({
-  tankType: z.string().min(1, "required"),
-  level: z.string().min(1, "required"),
+    id:z.string(),
+    name: z.string().min(1, "required"),
+  description: z.string().min(1, "required"),
 });
 const Page = () => {
     const form = useForm<z.infer<typeof formSchema>>({
@@ -47,82 +48,84 @@ const Page = () => {
     });
   
     const { setValue } = form;
-    const [listCategory, setListCategory] = useState<CategoryType[]>([]);
+    const [listBreed, setListBreed] = useState<BreedType[]>([]);
     const [pageSize, setPageSize] = useState(9);
     const [pageNumber, setPageNumber] = useState(1);
-    const [totalCategories, setTotalCategories] = useState<number>(0);
+    const [totalBreeds, setTotalBreeds] = useState<number>(0);
     const [totalPage, setTotalPage] = useState<number>(1);
     const [popup, setPopup] = useState(false);
-    const [category, setCategory] = useState<CategoryType | null>(null);
+    const [breed, setBreed] = useState<BreedType | null>(null);
     const router = useRouter();
   
     useEffect(() => {
-      handleGetCategories();
+      handleGetBreeds();
     }, [pageNumber]);
   
     useEffect(() => {
-      setTotalPage(Math.ceil(totalCategories / pageSize));
-    }, [totalCategories, pageSize]);
+      setTotalPage(Math.ceil(totalBreeds / pageSize));
+    }, [totalBreeds, pageSize]);
   
-    const handleOpenPopup = (category?: CategoryType) => {
-      setPopup(true);
-      if (category) {
-        setCategory(category);
-        setValue("level", category.level);
-        setValue("tankType", category.tankType);
-      } else {
-        setCategory(null);
-        form.reset();
-      }
-    };
+    const handleOpenPopup = (breed?: BreedType) => {
+        setPopup(true);
+        if (breed) {
+          setBreed(breed);
+          setValue("id", breed.id);
+          setValue("name", breed.name);
+          setValue("description", breed.description);
+        } else {
+          setBreed(null);
+          setValue("id", uuidv4()); // Only set a new UUID for new breeds
+          form.reset({ id: uuidv4() });
+        }
+      };      
   
     const handleClosePopup = () => {
       setPopup(false);
-      setCategory(null);
+      setBreed(null);
       form.reset();
     };
-  const handleDeleteItem = async (id: string) => {
-    try {
-        let response = await handleDeleteCategoryAPI(id)
-    if (response.status === 200) {
-        toast({
-            title: "Successful",
-            description: "Category was deleted successfully",
-          });
-    }          
-    handleGetCategories();
-    } catch (error) {
-        console.log(error);
+//   const handleDeleteItem = async (id: string) => {
+//     try {
+//         let response = await handleDeleteBreedAPI(id)
+//     if (response.status === 200) {
+//         toast({
+//             title: "Successful",
+//             description: "Breed was deleted successfully",
+//           });
+//     }          
+//     handleGetBreeds();
+//     } catch (error) {
+//         console.log(error);
         
-    }
-  }
+//     }
+//   }
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
       try {
         console.log(data);
         
-        const response: AxiosResponse = category
-          ? await handlePatchCategoryAPI(category.id, data)
-          : await handlePostCategoryAPI(data);
+        const response: AxiosResponse = breed
+          ? await handlePutBreedAPI(breed.id, data)
+          : await handlePostBreedAPI(data);
         if (response.status === 200) {
           toast({
             title: "Successful",
-            description: category
-              ? `${category.tankType} - ${category.level} updated successfully`
-              : "New category added successfully",
+            description: breed
+              ? `${breed.name} updated successfully`
+              : "New breed added successfully",
           });
           handleClosePopup();
-          handleGetCategories();
+          handleGetBreeds();
         }
       } catch (error) {
         console.error(error);
       }
     };
   
-    const handleGetCategories = async () => {
+    const handleGetBreeds = async () => {
       try {
-        const response = await handleGetCategoryAPI();
+        const response = await handleGetBreedAPI();
         if (response?.status === 200) {
-          setListCategory(response.data);
+          setListBreed(response.data);
           getTotalCount(response);
         }
       } catch (error) {
@@ -135,7 +138,7 @@ const Page = () => {
       if (paginationHeader) {
         const paginationData = JSON.parse(paginationHeader);
         const totalCount = paginationData.TotalCount;
-        setTotalCategories(totalCount);
+        setTotalBreeds(totalCount);
       }
     };
   
@@ -146,18 +149,19 @@ const Page = () => {
     return (
       <>
         <BackButton text="Go Back" link="/" />
-        <button onClick={() => handleOpenPopup()}>Add new category</button>
+        <button onClick={() => handleOpenPopup()}>Add new breed</button>
         {popup && (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <input type="hidden" {...form.register("id")}/>
           <input
           className="uppercase text-xs font-bold text-zinc-500 dark:text-white"
-            placeholder="Enter Level"
-            {...form.register("level")}
+            placeholder="Enter Name"
+            {...form.register("name")}
           />
           <input
           className="uppercase text-xs font-bold text-zinc-500 dark:text-white"
-            placeholder="Enter Tank Type"
-            {...form.register("tankType")}
+            placeholder="Enter Description"
+            {...form.register("description")}
           />
           <Button type="submit">Submit</Button>
           <Button type="button" onClick={handleClosePopup}>
@@ -165,7 +169,7 @@ const Page = () => {
           </Button>
         </form>
       )}
-        {listCategory && (
+        {listBreed && (
           <div className="mt-10">
             <Table>
               <TableCaption>A list of recent products</TableCaption>
@@ -177,14 +181,11 @@ const Page = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {listCategory.map((product) => (
+                {listBreed.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell>{product.tankType}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {product.level}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {product.createdAt}
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell className="hidden md:table-cell break-words">
+                      {product.description}
                     </TableCell>
                     <TableCell>
                       <button
@@ -193,12 +194,12 @@ const Page = () => {
                       >
                         Edit
                       </button>
-                      <button
+                      {/* <button
                         className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs"
                         onClick={() => handleDeleteItem(product.id)}
                       >
                         Delete
-                      </button>
+                      </button> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -206,7 +207,7 @@ const Page = () => {
             </Table>
           </div>
         )}
-        {totalPage > 0 && (
+        {totalPage > 1 && (
           <div className="list-pagination flex items-center md:mt-10 mt-7">
             <HandlePagination onPageChange={handleChangePage} pageCount={totalPage} />
           </div>

@@ -122,9 +122,9 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     try {
       let response = await handleGetProductFishByIdAPI(id);
       console.log(id);
-      
+
       if (response.status === 200) {
-        var data = response as AxiosResponse
+        var data = response as AxiosResponse;
         setFish(data.data.data as ProductType);
         // Populate initial awards for editing
         const awards = data.data.data.fish?.awards.map((award: any) => ({
@@ -134,15 +134,14 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
           awardDate: award.award_date,
         }));
         console.log(awards);
-        
+
         setValue("fishModel.fishAward", awards || []);
-      }
-      else {
-        var error = response as AxiosError
+      } else {
+        var error = response as AxiosError;
         toast({
           title: "Error",
-          content: error.response?.data as string
-      })
+          content: error.response?.data as string,
+        });
       }
     } catch (error) {
       console.log(error);
@@ -170,8 +169,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
         if (fish.fish.age) setValue("fishModel.age", fish.fish.age);
         if (fish.fish.origin) setValue("fishModel.origin", fish.fish.origin);
         if (fish.fish.sex) setValue("fishModel.sex", fish.fish.sex);
-        if (fish.fish.food_amount)
-          setValue("fishModel.foodAmount", fish.fish.food_amount);
+        if (fish.fish.foodAmount)
+          setValue("fishModel.foodAmount", fish.fish.foodAmount);
         if (fish.fish.weight) setValue("fishModel.weight", fish.fish.weight);
         if (fish.fish.health) setValue("fishModel.health", fish.fish.health);
       }
@@ -187,13 +186,13 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   };
 
   const handleRemoveAward = (index: number) => {
-    let fishAwards = form.getValues("fishModel.fishAward")
+    let fishAwards = form.getValues("fishModel.fishAward");
     console.log("fishAwards", fishAwards);
     if (fishAwards) {
-      let awardId = fishAwards[index].id
+      let awardId = fishAwards[index].id;
       console.log("handleRemoveAward", awardId);
       if (awardId) {
-        setDeleteAward((prev) => [...prev, awardId])
+        setDeleteAward((prev) => [...prev, awardId]);
       }
     }
     remove(index);
@@ -211,7 +210,9 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
             data &&
             data.fishModel &&
             data.fishModel.fishAward &&
-            data.fishModel.fishAward.filter((award) => award.id === null || !deleteAward.includes(award.id)),
+            data.fishModel.fishAward.filter(
+              (award) => award.id === null || !deleteAward.includes(award.id)
+            ),
         },
       };
       let response = await hanldePatchProductFishAPI(params.id, payload);
@@ -223,7 +224,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
         router.push("/fish");
       }
       if (response && response.status === 401) {
-        router.push("/auth")
+        router.push("/auth");
       }
     } catch (error) {
       console.error(error);
@@ -236,8 +237,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
       <h3 className="text-2xl mb-4">Edit Fish Product</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-{/* Name */}
-<FormField
+          {/* Name */}
+          <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
@@ -288,7 +289,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  New Image {" "}
+                  New Image{" "}
                 </FormLabel>
                 <FormControl>
                   <input
