@@ -1,7 +1,11 @@
 import { baseURL } from "@/components/config";
+import { normalizeData } from "@/components/helpers/helpers";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import axios from "axios";
-
+axios.interceptors.response.use(response => {
+  response.data = normalizeData(response.data);
+  return response;
+});
 export const handleGetBreedAPI = async () => {
     try {
     var res = `${baseURL}/v1/breed`

@@ -5,7 +5,7 @@ export interface TankType {
     id: string;
     product_id?: string;
     size?: string;
-    size_information?: string;
-    glass_type?: string;
+    sizeInformation?: string;
+    glassType?: string;
     categories: CategoryType[]
 }

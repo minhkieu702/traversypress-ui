@@ -8,13 +8,13 @@ export interface ProductType {
     name?: string,
     slug?: string,
     description?: string,
-    description_detail?: string,
+    descriptionDetail?: string,
     type?:string
-    supplier_id?:string|null,
-    stock_quantity: number,
+    supplierId?:string|null,
+    stockQuantity: number,
     sold?:boolean|null,
     price: number,
-    original_price: number,
+    originalPrice: number,
     feedbacks:FeedbackType[]
     images: ImageType[]
     fish?: FishType,

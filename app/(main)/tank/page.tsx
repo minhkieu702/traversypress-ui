@@ -1,20 +1,20 @@
 'use client'
-import { handleGetProductFishAPI } from "@/components/api/products/fish";
+import { handleGetProductTankAPI } from "@/components/api/products/tank";
 import BackButton from "@/components/BackButton"
-import ProductTable from "@/components/fish/FishsTable";
 import HandlePagination from "@/components/Pagination";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "@/components/ui/use-toast";
-import { FishType } from "@/types/ResponseModel/FishType";
+import { TankType } from "@/types/ResponseModel/TankType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { Toast } from "@radix-ui/react-toast";
 import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ProductTable from "@/components/fish/FishsTable";
 
-const FishPage = () => {
-    const [listProductFishes, setListProductFishes] = useState<ProductType[]>();
+const TankPage = () => {
+    const [listProductTankes, setListProductTankes] = useState<ProductType[]>();
     const [pageSize, setPageSize] = useState(9);
     const [pageNumber, setPageNumber] = useState(1);
     const [totalProduct, setTotalProduct] = useState<number>(0);
@@ -33,12 +33,12 @@ const FishPage = () => {
         try {
             console.log("page number", pageNumber);
             
-            let response = await handleGetProductFishAPI(pageSize, pageNumber, null, null, null, null)
+            let response = await handleGetProductTankAPI(pageSize, pageNumber, null, null, null, null)
         if (response?.status === 200) {
             var data = response as AxiosResponse
             let listporudct = data.data as ProductType[]
             console.log("listporudct", listporudct);
-            setListProductFishes(listporudct)
+            setListProductTankes(listporudct)
             getTotalCount(response)
             return
         }
@@ -73,17 +73,17 @@ const FishPage = () => {
     return(
         <>
         <BackButton text='Go Back' link='/' />
-        <button onClick={c => router.push('/fish/add')}>Add new product</button>
+        <button onClick={c => router.push('/tank/add')}>Add new product</button>
         {
-            listProductFishes && <ProductTable data={listProductFishes}  type="fish" />
+            listProductTankes && <ProductTable data={listProductTankes} type="tank" />
         }
         {
             totalPage > 0 && <div className='list-pagination flex items-center md:mt-10 mt-7'>
-                <HandlePagination onPageChange={handleChangePage} pageCount={totalPage}/>
+                <HandlePagination onPageChange={handleChangePage} pageCount={totalPage} />
             </div>
         }
         </>
     )
 }
 
-export default FishPage
+export default TankPage

@@ -1,4 +1,5 @@
 import { baseURL } from "@/components/config";
+import { logFormData, normalizeData } from "@/components/helpers/helpers";
 import { TankProductCreateModel } from "@/types/CreateModel/TankProductCreateModel";
 import { TankProductUpdateModel } from "@/types/UpdateModel/TankProductUpdateModel";
 import axios, { AxiosError } from "axios";
@@ -35,6 +36,7 @@ const updateForm = async (data: TankProductUpdateModel) => {
       formData.append("tankModel", JSON.stringify(tankModel));
     }
   }
+  return formData
 };
 
 const addForm = async (data: TankProductCreateModel) => {
@@ -67,15 +69,20 @@ const addForm = async (data: TankProductCreateModel) => {
       }
       formData.append("tankModel", JSON.stringify(tankModel));
     }
-    // Handle fishAward array
+    // Handle tankAward array
     if (data.categoriesIds) {
-      formData.append("categoriesIds", JSON.stringify(data.categoriesIds));
+      data.categoriesIds.forEach((cat, index) => {
+        formData.append(`categoriesIds[${index}]`, cat);
+      })
     }  
   
     return formData;
   };
-
-  export const handleGetProductTanlAPI = async (
+  axios.interceptors.response.use(response => {
+    response.data = normalizeData(response.data);
+    return response;
+  });
+  export const handleGetProductTankAPI = async (
     pageSize: number,
     pageNumber: number,
     search: string | null,
@@ -96,14 +103,14 @@ const addForm = async (data: TankProductCreateModel) => {
       });
       return response;
     } catch (error) {
-      console.error("Error fetching fish products:", error);
+      console.error("Error fetching tank products:", error);
       return error as AxiosError;
     }
   };
 
   export const handleGetProductTankByIdAPI = async (id: string) => {
     try {
-      const response = await axios.get(`${baseURL}/v1/product/fish/${id}`);
+      const response = await axios.get(`${baseURL}/v1/product/tank/${id}`);
       return response;
     } catch (error) {
       console.log(error);
@@ -118,7 +125,7 @@ const addForm = async (data: TankProductCreateModel) => {
     try {
       let formData = await updateForm(data);
       var res = `${baseURL}/v1/product/tank/${id}`;
-      
+      logFormData(formData)
       var jwtToken = localStorage.getItem("jwt");
       const response = await axios.patch(res, formData, {
         headers: {
@@ -126,6 +133,29 @@ const addForm = async (data: TankProductCreateModel) => {
           "Content-Type": "multipart/form-data",
         },
       });
+      return response;
+    } catch (error) {
+      console.log("error", error);
+      return error as AxiosError
+    }
+  };
+
+  export const handlePostProductTankAPI = async (
+    data: TankProductCreateModel
+  ) => {
+    try {
+      let formData = await addForm(data);
+      var res = `${baseURL}/v1/product/tank`;
+      logFormData(formData);
+      var jwtToken = localStorage.getItem("jwt");
+      console.log(res);
+      const response = await axios.post(res, formData, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("response", response);
       return response;
     } catch (error) {
       console.log("error", error);

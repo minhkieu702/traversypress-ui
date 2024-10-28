@@ -9,5 +9,5 @@ export interface TankProductCreateModel {
     originalPrice?: number | null; // Assuming double means number
     imageFiles?: File[] | null; // Binary data as string
     tankModel: TankCreateModel; // Required field for tank model
-    categoriesIds?: (string | null)[] | null; // UUIDs for categories
+    categoriesIds?: string[] | null; // UUIDs for categories
   };

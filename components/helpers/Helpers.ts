@@ -20,3 +20,17 @@ const convertToBinaryString = async (file: File): Promise<string> => {
       console.log(`${key}:`, value);
     });
   };
+
+  export const normalizeData = (data: any): any => {
+    if (Array.isArray(data)) {
+      return data.map(normalizeData);
+    } else if (data !== null && typeof data === 'object') {
+      return Object.keys(data).reduce((acc: any, key) => {
+        const camelCaseKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+        acc[camelCaseKey] = normalizeData(data[key]);
+        return acc;
+      }, {});
+    }
+    return data;
+  };
+  

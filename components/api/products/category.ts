@@ -1,7 +1,13 @@
 import { baseURL } from "@/components/config";
+import { normalizeData } from "@/components/helpers/helpers";
 import axios from "axios";
 
-export const handleGetBreedAPI = async () => {
+axios.interceptors.response.use(response => {
+  response.data = normalizeData(response.data);
+  return response;
+});
+
+export const handleGetCategoryAPI = async () => {
     try {
     var res = `${baseURL}/v1/category`
     const response = await axios.get(res, {

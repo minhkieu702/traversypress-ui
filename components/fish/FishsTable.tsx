@@ -10,11 +10,12 @@ import {
 } from '@/components/ui/table';
 import Link from 'next/link';
 
-interface FishesTableProps {
-  data: ProductType[];
+interface ProductTableProps {
+  data: ProductType[],
+  type: string
 }
 
-const FishesTable = ({ data }: FishesTableProps) => {
+const ProductTable = ({ data, type }: ProductTableProps) => {
   return (
     <div className='mt-10'>
       <Table>
@@ -34,11 +35,11 @@ const FishesTable = ({ data }: FishesTableProps) => {
             <TableRow key={product.id}>
               <TableCell>{product.name}</TableCell>
               <TableCell className='hidden md:table-cell'>{product.description}</TableCell>
-              <TableCell className='hidden md:table-cell'>{product.stock_quantity}</TableCell>
+              <TableCell className='hidden md:table-cell'>{product.stockQuantity}</TableCell>
               <TableCell className='hidden md:table-cell'>{product.price.toLocaleString('vi-VI')} VND</TableCell>
-              <TableCell className='hidden md:table-cell'>{product.original_price.toLocaleString('vi-VI')} VND</TableCell>
+              <TableCell className='hidden md:table-cell'>{product.originalPrice?.toLocaleString('vi-VI')} VND</TableCell>
               <TableCell>
-                <Link href={`/fish/edit/${product.id}`}>
+                <Link href={`/${type}/edit/${product.id}`}>
                   <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs'>
                     Edit
                   </button>
@@ -52,4 +53,4 @@ const FishesTable = ({ data }: FishesTableProps) => {
   );
 }
 
-export default FishesTable;
+export default ProductTable;

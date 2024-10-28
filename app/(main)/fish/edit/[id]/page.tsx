@@ -158,11 +158,11 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     if (fish) {
       if (fish.name) setValue("name", fish.name);
       if (fish.description) setValue("description", fish.description);
-      if (fish.description_detail)
-        setValue("descriptionDetail", fish.description_detail);
-      if (fish.stock_quantity) setValue("stockQuantity", fish.stock_quantity);
+      if (fish.descriptionDetail)
+        setValue("descriptionDetail", fish.descriptionDetail);
+      if (fish.stockQuantity) setValue("stockQuantity", fish.stockQuantity);
       if (fish.price) setValue("price", fish.price);
-      if (fish.original_price) setValue("originalPrice", fish.original_price);
+      if (fish.originalPrice) setValue("originalPrice", fish.originalPrice);
       if (fish.fish) {
         if (fish.fish.breed.id)
           setValue("fishModel.breedId", fish.fish.breed.id);

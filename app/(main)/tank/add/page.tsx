@@ -17,15 +17,16 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { handlePostProductFishAPI } from "@/components/api/products/fish";
-import { BreedType } from "@/types/ResponseModel/BreedType";
-import { handleGetBreedAPI } from "@/components/api/products/breed";
+import { CategoryType } from "@/types/ResponseModel/CategoryType";
 import { useToast } from "@/components/ui/use-toast";
 import { AxiosError } from "axios";
+import { handleGetCategoryAPI } from "@/components/api/products/category";
+import { handlePostProductTankAPI } from "@/components/api/products/tank";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
   description: z.string().min(1, "Description is required"), // Mô tả
-  descriptionDetail: z.string().optional(), // Mô tả chi tiết, có thể không bắt buộc
+  descriptionDetail: z.string().min(1, "Description detail is required"), // Mô tả chi tiết, có thể không bắt buộc
   stockQuantity: z.preprocess(
     (val) => Number(val),
     z.number().min(1, "Stock must be a positive number")
@@ -35,84 +36,57 @@ const formSchema = z.object({
     z.number().min(1).positive("Price must be greater than 0")
   ),
   originalPrice: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().positive().optional()
+    (val) => Number(val),
+    z.number().min(1).positive("Original Price must be greater than 0")
   ),
   imageFiles: z.array(z.any()).optional(), // Ảnh sản phẩm, có thể là tệp upload
-  fishModel: z.object({
-    breedId: z.string().min(1, "Breed ID is required"), // Mã giống cá
-    size: z.preprocess(
-      (val) => Number(val),
-      z.number().positive("Size must be greater than 0")
-    ),
-    age: z.preprocess(
-      (val) => Number(val),
-      z.number().min(0, "Age must be a positive number")
-    ),
-    origin: z.string().min(1, "Origin is required"), // Nguồn gốc của cá
-    sex: z.string(), // Giới tính của cá
-    foodAmount: z.preprocess(
-      (val) => Number(val),
-      z.number().positive("Food amount must be positive")
-    ),
-    weight: z.preprocess(
-      (val) => Number(val),
-      z.number().positive("Weight must be positive")
-    ),
-    health: z.string().min(1, "Health status is required"), // Tình trạng sức khỏe
-    dateOfBirth: z.string().min(1, "Date of birth is required"), // Ngày sinh
+  tankModel: z.object({
+    size: z.string().min(1, "Size is required"),
+    sizeInformation: z.string().min(1, "Size information is required"),
+    glassType: z.string().min(1, "Glass type is required"), // Nguồn gốc của cá
   }),
-  fishAward: z
-    .array(
-      z.object({
-        name: z.string().min(1, "Award name is required"), // Tên giải thưởng
-        description: z.string().optional(), // Mô tả giải thưởng
-        awardDate: z.string().min(1, "Award date is required"), // Ngày nhận giải thưởng
-      })
-    )
-    .optional(), // Có thể không bắt buộc (nếu sản phẩm chưa nhận giải)
+  categoriesIds: z.array(z.string()),
 });
 
 const AddProductFishPage = () => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [breed, setBreed] = useState<BreedType[]>();
+  const [category, setCategory] = useState<CategoryType[]>([]);
 
   const [error, setError] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-  });
-  const { fields, append, remove } = useFieldArray({
-    control: form.control, // use the control from useForm
-    name: "fishAward", // the name of the field array in the schema
+    defaultValues: {
+      categoriesIds: [],
+    },
   });
 
   useEffect(() => {
-    const handleGetBreed = async () => {
+    const handleGetCategory = async () => {
       try {
-        let response = await handleGetBreedAPI();
+        let response = await handleGetCategoryAPI();
         console.log(response);
         if (response.status === 200) {
-          setBreed(response.data as BreedType[]);
+          setCategory(response.data as CategoryType[]);
         }
       } catch (error) {
         console.log(error);
       }
     };
-    handleGetBreed();
+    handleGetCategory();
   }, []);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      let response = await handlePostProductFishAPI(data);
+      let response = await handlePostProductTankAPI(data);
       if (response.status !== 200) {
-        var error = response as AxiosError
+        var error = response as AxiosError;
         toast({
           title: "Error",
-          content: error.response?.data as string
-      })
+          content: error.response?.data as string,
+        });
         setError("Your action is failed, please try again");
         return;
       }
@@ -120,7 +94,7 @@ const AddProductFishPage = () => {
         title: "Adding successful",
         description: `${data.name} production is added successfully`,
       });
-      router.push("/fish");
+      router.push("/tank");
     } catch (error) {
       setError("Your action is failed, please try again");
       console.log(error);
@@ -273,7 +247,7 @@ const AddProductFishPage = () => {
                   Image Files
                 </FormLabel>
                 <FormControl>
-                  <input
+                  <Input
                     type="file"
                     multiple
                     className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
@@ -288,36 +262,36 @@ const AddProductFishPage = () => {
             )}
           />
 
-          {/* Fish Model */}
-          <FormField
-            control={form.control}
-            name="fishModel.breedId"
-            render={({ field }) => (
-              <FormItem>
-                {/* <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Breed
-                </FormLabel> */}
-                <FormControl>
-                  <select
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    {...field}
-                  >
-                    <option>Breed</option>
-                    {breed?.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                      </option>
-                    ))}
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormControl>
+            <div className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0">
+              {category?.map((cat) => (
+                <div key={cat.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={form.watch("categoriesIds").includes(cat.id)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      const currentIds = form.getValues("categoriesIds");
+                      form.setValue(
+                        "categoriesIds",
+                        checked
+                          ? [...currentIds, cat.id]
+                          : currentIds.filter((id) => id !== cat.id)
+                      );
+                    }}
+                    className="checkbox-class-name" // Apply any additional styles if needed
+                  />
+                  <label className="text-black dark:text-white">
+                    {cat.tank_type} - {cat.level}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </FormControl>
 
           <FormField
             control={form.control}
-            name="fishModel.size"
+            name="tankModel.size"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
@@ -325,7 +299,6 @@ const AddProductFishPage = () => {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
                     className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
                     placeholder="Enter Size"
                     {...field}
@@ -338,7 +311,7 @@ const AddProductFishPage = () => {
 
           <FormField
             control={form.control}
-            name="fishModel.age"
+            name="tankModel.sizeInformation"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
@@ -346,9 +319,8 @@ const AddProductFishPage = () => {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
                     className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    placeholder="Enter Age"
+                    placeholder="Enter Size"
                     {...field}
                   />
                 </FormControl>
@@ -356,14 +328,14 @@ const AddProductFishPage = () => {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
-            name="fishModel.origin"
+            name="tankModel.glassType"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Origin
+                  Glass type
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -376,199 +348,6 @@ const AddProductFishPage = () => {
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name="fishModel.sex"
-            render={({ field }) => (
-              <FormItem>
-                {/* <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Sex
-                </FormLabel> */}
-                <FormControl>
-                  <select
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    {...field}
-                  >
-                    <option>Sex</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fishModel.foodAmount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Food Amount (grams/day)
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    placeholder="Enter Food Amount in grams/day"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fishModel.weight"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Weight (kg)
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    placeholder="Enter Weight in kg"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fishModel.health"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Health Status
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    placeholder="Enter Health Status"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fishModel.dateOfBirth"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                  Date of Birth
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormItem>
-            <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-              Fish Awards
-            </FormLabel>
-
-            {fields.map((item, index) => (
-              <div key={item.id} className="space-y-4 mb-4">
-                {/* Award Name Field */}
-                <FormField
-                  control={form.control}
-                  name={`fishAward.${index}.name`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                        Award Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white"
-                          placeholder="Enter Award Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Award Description Field */}
-                <FormField
-                  control={form.control}
-                  name={`fishAward.${index}.description`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                        Award Description
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white"
-                          placeholder="Enter Award Description"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Award Date Field */}
-                <FormField
-                  control={form.control}
-                  name={`fishAward.${index}.awardDate`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                        Award Date
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className="text-red-500"
-                >
-                  Remove Award
-                </Button>
-              </div>
-            ))}
-
-            <Button
-              type="button"
-              onClick={() => append({ name: "", awardDate: "" })}
-            >
-              Add Award
-            </Button>
-          </FormItem>
 
           <Button type="submit" className="w-full">
             Submit

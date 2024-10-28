@@ -13,6 +13,11 @@ export default function Home() {
           icon={<Newspaper className='text-slate-500' size={72} />}
         />
         <DashboardCard
+        title='Tank Products'
+        count={100}
+        icon={<Newspaper className='text-slate-500' size={72} />}
+      />
+        <DashboardCard
           title='Posts'
           count={100}
           icon={<Newspaper className='text-slate-500' size={72} />}
