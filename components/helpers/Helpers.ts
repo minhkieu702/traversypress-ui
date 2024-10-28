@@ -15,3 +15,8 @@ const convertToBinaryString = async (file: File): Promise<string> => {
     return Promise.all(promises);
   };
   
+  export const logFormData = (formData: FormData) => {
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+  };

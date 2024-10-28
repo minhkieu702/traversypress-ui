@@ -8,6 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 import { FishType } from "@/types/ResponseModel/FishType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { Toast } from "@radix-ui/react-toast";
+import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -34,16 +35,20 @@ const FishPage = () => {
             
             let response = await handleGetProductFishAPI(pageSize, pageNumber, null, null, null, null)
         if (response?.status === 200) {
-            let listporudct = response.data as ProductType[]
+            var data = response as AxiosResponse
+            let listporudct = data.data as ProductType[]
             console.log("listporudct", listporudct);
             setListProductFishes(listporudct)
             getTotalCount(response)
-            response.headers
             return
         }
-        toast({
-            title: "No data"
-        })
+        else {
+            var error = response as AxiosError
+            toast({
+                title: "Error",
+                content: error.response?.data as string
+            })
+          }
         } catch (error) {
           console.log(error);
             

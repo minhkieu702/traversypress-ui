@@ -8,7 +8,7 @@ export interface TankProductUpdateModel {
     price?: number | null; // Assuming double means number
     originalPrice?: number | null; // Assuming double means number
     deleteImages?: (string | null)[] | null; // UUIDs of images to delete
-    updateImages?: (string | null)[] | null; // Binary data for images to update
+    updateImages?: File[] | null; // Binary data for images to update
     tankModel?: TankUpdateModel | null; // Nullable and optional tank model for update
   };
   

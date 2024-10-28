@@ -64,7 +64,6 @@ const LoginForm = () => {
     
     if (decoded.role==="Admin") {
     localStorage.setItem("jwt", response.data.token);
-    localStorage.setItem("role", decoded.role);
       router.push("/")
     }
     } catch (error) {

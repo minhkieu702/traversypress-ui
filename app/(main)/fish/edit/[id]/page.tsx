@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
+import { AxiosError, AxiosResponse } from "axios";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -42,6 +43,7 @@ const formSchema = z.object({
     (val) => (val === "" ? undefined : Number(val)),
     z.number().positive()
   ),
+  imageFiles: z.array(z.any()).optional(), // Ảnh sản phẩm, có thể là tệp upload
   deleteImages: z.array(z.string().uuid()).optional(),
   updateImages: z.array(z.any()).optional(),
   fishModel: z.object({
@@ -89,7 +91,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const { toast } = useToast();
   const router = useRouter();
   const [breed, setBreed] = useState<BreedType[]>([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<any>();
   const [fish, setFish] = useState<ProductType | null>(null);
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
   const [deleteAward, setDeleteAward] = useState<string[]>([]);
@@ -119,10 +121,13 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const handleGetProductFish = async (id: string) => {
     try {
       let response = await handleGetProductFishByIdAPI(id);
+      console.log(id);
+      
       if (response.status === 200) {
-        setFish(response.data.data as ProductType);
+        var data = response as AxiosResponse
+        setFish(data.data.data as ProductType);
         // Populate initial awards for editing
-        const awards = response.data.data.fish?.awards.map((award: any) => ({
+        const awards = data.data.data.fish?.awards.map((award: any) => ({
           id: award.id,
           name: award.name,
           description: award.description,
@@ -131,6 +136,13 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
         console.log(awards);
         
         setValue("fishModel.fishAward", awards || []);
+      }
+      else {
+        var error = response as AxiosError
+        toast({
+          title: "Error",
+          content: error.response?.data as string
+      })
       }
     } catch (error) {
       console.log(error);
@@ -203,8 +215,15 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
         },
       };
       let response = await hanldePatchProductFishAPI(params.id, payload);
-      if (response.status === 200) {
+      if (response && response.status === 200) {
+        toast({
+          title: "Editing successful",
+          description: `${data.name} production is edited successfully`,
+        });
         router.push("/fish");
+      }
+      if (response && response.status === 401) {
+        router.push("/auth")
       }
     } catch (error) {
       console.error(error);
@@ -262,6 +281,31 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
                 </div>
               ))}
           </div>
+
+          <FormField
+            control={form.control}
+            name="updateImages"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  New Image {" "}
+                </FormLabel>
+                <FormControl>
+                  <input
+                    type="file"
+                    multiple
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []); // Convert FileList to array
+                      field.onChange(files); // Pass files array to the form state
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Description */}
           <FormField
             control={form.control}

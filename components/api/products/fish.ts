@@ -1,14 +1,23 @@
 import { baseURL } from "@/components/config";
-import { convertImageListToBinaryStrings } from "@/components/helpers/Helpers";
 import data from "@/data/analytics";
 import { FishProductCreateModel } from "@/types/CreateModel/FishProductCreateModel";
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { FishProductUpdateModel } from "@/types/UpdateModel/FishProductUpdateModel";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Award } from "lucide-react";
 import { describe } from "node:test";
-import { string } from "zod";
+import { any, string } from "zod";
 import { v4 as uuidv4 } from 'uuid';
+import { convertImageListToBinaryStrings, logFormData } from "@/components/helpers/helpers";
+
+const checkUnauthorized = (response: AxiosError, router: any) => {
+  console.log("im in checkresponsestatus");
+
+  if (response.status === 401) {
+    console.log("checkresponsestatus", response);
+    router.push("/auth");
+  }
+};
 
 const updateForm = async (data: FishProductUpdateModel) => {
   const formData = new FormData();
@@ -30,6 +39,7 @@ const updateForm = async (data: FishProductUpdateModel) => {
       if (string) formData.append(`deleteImages[${index}]`, string);
     });
   }
+  
   if (data.updateImages) {
     data.updateImages.forEach((file, index) => {
       formData.append(`updateImages${index}`, file);
@@ -98,28 +108,12 @@ const addForm = async (data: FishProductCreateModel) => {
   }
   // Handle fishAward array
   if (data.fishAward) {
-    // let awards = [];
-    // data.fishAward.forEach((item, index) => {
-    //   if (item) {
-    //     let award = {
-    //       name: item.name,
-    //       description: item.description,
-    //       awardDate: item.awardDate
-    //     };
-    //     awards[index] = award;
-    //   }
-    // });
     formData.append("fishAward", JSON.stringify(data.fishAward));
   }  
 
   return formData;
 };
 
-const logFormData = (formData: FormData) => {
-  formData.forEach((value, key) => {
-    console.log(`${key}:`, value);
-  });
-};
 export const handlePostProductFishAPI = async (
   data: FishProductCreateModel
 ) => {
@@ -140,7 +134,7 @@ export const handlePostProductFishAPI = async (
     return response;
   } catch (error) {
     console.log("error", error);
-    throw new Error(error as string);
+    return error as AxiosError
   }
 };
 
@@ -163,48 +157,41 @@ export const handleGetProductFishAPI = async (
         ...(direction && { Direction: direction }),
       },
     });
-    console.log("response", response);
-    console.log("data", response.data);
-    console.log("fishes response", response.data as ProductType[]);
-    console.log(response);
     return response;
   } catch (error) {
     console.error("Error fetching fish products:", error);
+    return error as AxiosError
   }
 };
 
 export const handleGetProductFishByIdAPI = async (id: string) => {
   try {
     const response = await axios.get(`${baseURL}/v1/product/fish/${id}`);
-    console.log(response);
     return response;
   } catch (error) {
     console.log(error);
-    return error as AxiosResponse;
+    return error as AxiosError;
   }
 };
 
 export const hanldePatchProductFishAPI = async (
   id: string,
-  data: FishProductUpdateModel
+  data: FishProductUpdateModel,
 ) => {
   try {
     let formData = await updateForm(data);
     var res = `${baseURL}/v1/product/fish/${id}`;
-    logFormData(formData);
+    
     var jwtToken = localStorage.getItem("jwt");
-    console.log("jwtToken", jwtToken);
-    console.log(res);
     const response = await axios.patch(res, formData, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log("response", response);
     return response;
   } catch (error) {
     console.log("error", error);
-    throw new Error(error as string);
+    return error as AxiosError
   }
 };

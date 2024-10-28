@@ -11,8 +11,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import ThemeToggler from '@/components/ThemeToggler';
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
+  const router = useRouter()
+  const hanldeLogout = () => {
+    localStorage.removeItem("jwt")
+    router.push('/auth')
+  }
   return (
     <div className='bg-primary dark:bg-slate-700 text-white py-2 px-5 flex justify-between'>
       <Link href='/'>
@@ -35,7 +41,7 @@ const Navbar = () => {
               <Link href='/profile'>Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href='/auth'>Logout</Link>
+              <p onClick={hanldeLogout}>Logout</p>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
