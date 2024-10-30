@@ -17,8 +17,6 @@ import { Input } from "@/components/ui/input";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { BreedType } from "@/types/ResponseModel/BreedType";
-import { ProductType } from "@/types/ResponseModel/ProductType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -26,6 +24,9 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { AxiosError, AxiosResponse } from "axios";
+import { BreedType } from "@/types/ResponseModel/BreedType";
+import { ProductType } from "@/types/ResponseModel/ProductType";
+import { AwardType } from "@/types/ResponseModel/AwardType";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -121,17 +122,15 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const handleGetProductFish = async (id: string) => {
     try {
       let response = await handleGetProductFishByIdAPI(id);
-      console.log(id);
-
       if (response.status === 200) {
         var data = response as AxiosResponse;
         setFish(data.data.data as ProductType);
         // Populate initial awards for editing
-        const awards = data.data.data.fish?.awards.map((award: any) => ({
+        const awards = data.data.data.fish?.awards.map((award: AwardType) => ({
           id: award.id,
           name: award.name,
           description: award.description,
-          awardDate: award.award_date,
+          awardDate: award.awardDate,
         }));
         console.log(awards);
 
