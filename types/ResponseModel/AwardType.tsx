@@ -2,9 +2,9 @@ import { ImageType } from "./ImageType";
 
 export interface AwardType{
     id: string;
-    fish_id: string;
+    fishId: string;
     name: string;
     description: string;
-    award_date:string;
+    awardDate:string;
     image?:string|null
 }
