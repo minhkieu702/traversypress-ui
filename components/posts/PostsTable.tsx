@@ -8,8 +8,8 @@ import {
   TableCaption,
 } from '@/components/ui/table';
 import Link from 'next/link';
-import posts from '@/data/posts';
-import { Post } from '@/types/posts';
+import posts from '../../data/posts';
+import { Post } from '../../types/posts';
 
 interface PostsTableProps {
   limit?: number;
