@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { handleError, logFormData, normalizeData } from "@/components/helpers/helpers";
+import { handleError, logFormData, normalizeData } from "../../helpers/helpers";
 import axios, { AxiosError } from "axios";
 import { TankProductCreateModel } from "../../../types/CreateModel/TankProductCreateModel";
 import { TankProductUpdateModel } from "../../../types/UpdateModel/TankProductUpdateModel";

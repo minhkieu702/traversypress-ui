@@ -4,7 +4,7 @@ import { Award } from "lucide-react";
 import { describe } from "node:test";
 import { any, string } from "zod";
 import { v4 as uuidv4 } from 'uuid';
-import { convertImageListToBinaryStrings, handleError, logFormData, normalizeData } from "@/components/helpers/helpers";
+import { convertImageListToBinaryStrings, handleError, logFormData, normalizeData } from "../../helpers/helpers";
 import { FishProductCreateModel } from "../../../types/CreateModel/FishProductCreateModel";
 import { FishProductUpdateModel } from "../../../types/UpdateModel/FishProductUpdateModel";
 
