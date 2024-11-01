@@ -1,5 +1,5 @@
 "use client";
-
+import { ThreeDots } from "react-loader-spinner";
 import BackButton from "@/components/BackButton";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -43,7 +43,8 @@ const formSchema = z.object({
 const LoginForm = () => {
   const router = useRouter();
   const [error, setError] = useState<string>('');
-  
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,6 +54,7 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    setLoading(true)
     try {
       let response = await handleSignInAPI(data);
     if (response.status !== 200) {
@@ -71,68 +73,87 @@ const LoginForm = () => {
      console.log(error);
      return
     }
+    setLoading(false)
   };
 
   return (
+    <>
+    {loading ? (
+<div className="flex items-center justify-center h-screen">
+<ThreeDots
+  visible={true}
+  height="80"
+  width="80"
+  color="#000000"
+  radius="9"
+  ariaLabel="three-dots-loading"
+  wrapperStyle={{}}
+  wrapperClass=""
+  />
+</div>
+    ) : (
     <Card>
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>
-          Log into your account with your credentials
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                    Email
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible: ring-offset-0"
-                      placeholder="Enter Email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <CardHeader>
+      <CardTitle>Login</CardTitle>
+      <CardDescription>
+        Log into your account with your credentials
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-2">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+        >
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Email
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible: ring-offset-0"
+                    placeholder="Enter Email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                    Password
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible: ring-offset-0"
-                      placeholder="Enter Password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Password
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible: ring-offset-0"
+                    placeholder="Enter Password"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 <p className="text-sm font-medium text-destructive">{error}</p>
-            <Button className="w-full">Sign In</Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          <Button className="w-full">Sign In</Button>
+        </form>
+      </Form>
+    </CardContent>
+  </Card>
+    )
+  }
+    </>
   );
 };
 

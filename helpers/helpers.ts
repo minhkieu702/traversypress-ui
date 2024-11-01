@@ -17,6 +17,17 @@ const convertToBinaryString = async (file: File): Promise<string> => {
     const promises = files.map(file => convertToBinaryString(file));
     return Promise.all(promises);
   };
+
+  
+  export const getTotalCount = (response: any) => {
+    const paginationHeader = response?.headers["x-pagination"];
+    if (paginationHeader) {
+      const paginationData = JSON.parse(paginationHeader);
+      const totalCount = paginationData.TotalCount;
+      console.log("TotalCount:", totalCount);
+      return totalCount;
+    }
+  };
   
   export const logFormData = (formData: FormData) => {
     formData.forEach((value, key) => {

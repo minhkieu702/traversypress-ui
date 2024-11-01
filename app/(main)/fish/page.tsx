@@ -1,3 +1,4 @@
+
 'use client'
 import { handleGetProductFishAPI } from "@/components/api/products/fish";
 import BackButton from "@/components/BackButton"
@@ -5,6 +6,7 @@ import ProductTable from "@/components/fish/FishsTable";
 import HandlePagination from "@/components/Pagination";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "@/components/ui/use-toast";
+import { getTotalCount } from "@/helpers/helpers";
 import { FishType } from "@/types/ResponseModel/FishType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { Toast } from "@radix-ui/react-toast";
@@ -39,7 +41,7 @@ const FishPage = () => {
             let listporudct = data.data as ProductType[]
             console.log("listporudct", listporudct);
             setListProductFishes(listporudct)
-            getTotalCount(response)
+            setTotalProduct(getTotalCount(response))
             return
         }
         else {
@@ -51,19 +53,8 @@ const FishPage = () => {
           }
         } catch (error) {
           console.log(error);
-            
         }
     }
-
-    const getTotalCount = (response: any) => {
-        const paginationHeader = response?.headers["x-pagination"];
-        if (paginationHeader) {
-          const paginationData = JSON.parse(paginationHeader);
-          const totalCount = paginationData.TotalCount;
-          setTotalProduct(totalCount);
-          console.log("TotalCount:", totalCount);
-        }
-      };
 
     const handleChangePage = (opt: number) => {
         console.log(opt);

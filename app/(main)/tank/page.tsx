@@ -6,12 +6,12 @@ import { Pagination } from "@/components/ui/pagination";
 import { toast } from "@/components/ui/use-toast";
 import { TankType } from "@/types/ResponseModel/TankType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
-import { Toast } from "@radix-ui/react-toast";
 import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProductTable from "@/components/fish/FishsTable";
+import { getTotalCount } from "@/helpers/helpers";
 
 const TankPage = () => {
     const [listProductTankes, setListProductTankes] = useState<ProductType[]>();
@@ -39,7 +39,7 @@ const TankPage = () => {
             let listporudct = data.data as ProductType[]
             console.log("listporudct", listporudct);
             setListProductTankes(listporudct)
-            getTotalCount(response)
+            setTotalProduct(getTotalCount(response));
             return
         }
         else {
@@ -54,16 +54,6 @@ const TankPage = () => {
             
         }
     }
-
-    const getTotalCount = (response: any) => {
-        const paginationHeader = response?.headers["x-pagination"];
-        if (paginationHeader) {
-          const paginationData = JSON.parse(paginationHeader);
-          const totalCount = paginationData.TotalCount;
-          setTotalProduct(totalCount);
-          console.log("TotalCount:", totalCount);
-        }
-      };
 
     const handleChangePage = (opt: number) => {
         console.log(opt);
