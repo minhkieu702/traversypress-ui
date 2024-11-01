@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { handleError, normalizeData } from "@/components/helpers/helpers";
+import { handleError, normalizeData } from "@/helpers/helpers";
 import { CategoryRequestModel } from "@/types/CreateModel/CategoryRequestModel";
 import axios, { AxiosResponse } from "axios";
 

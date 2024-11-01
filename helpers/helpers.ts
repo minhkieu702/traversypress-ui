@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "../ui/use-toast";
+import { toast } from "../components/ui/use-toast";
 
 const convertToBinaryString = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {

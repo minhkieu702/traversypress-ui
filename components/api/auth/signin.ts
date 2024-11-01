@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { handleError } from "@/components/helpers/helpers";
+import { handleError } from "@/helpers/helpers";
 import axios from "axios"
 export const handleSignInAPI = async (data: any) => {
     try {
