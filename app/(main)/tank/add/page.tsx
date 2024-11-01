@@ -17,11 +17,11 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { handlePostProductFishAPI } from "@/components/api/products/fish";
+import { CategoryType } from "@/types/ResponseModel/CategoryType";
 import { useToast } from "@/components/ui/use-toast";
 import { AxiosError } from "axios";
 import { handleGetCategoryAPI } from "@/components/api/products/category";
 import { handlePostProductTankAPI } from "@/components/api/products/tank";
-import { CategoryType } from "../../../../types/ResponseModel/CategoryType";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc

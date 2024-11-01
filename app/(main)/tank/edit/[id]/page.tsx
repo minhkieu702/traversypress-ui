@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { BreedType } from "@/types/ResponseModel/BreedType";
+import { ProductType } from "@/types/ResponseModel/ProductType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,8 +25,7 @@ import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { AxiosError, AxiosResponse } from "axios";
 import { handleGetCategoryAPI } from "@/components/api/products/category";
-import { CategoryType } from "../../../../../types/ResponseModel/CategoryType";
-import { ProductType } from "../../../../../types/ResponseModel/ProductType";
+import { CategoryType } from "@/types/ResponseModel/CategoryType";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),

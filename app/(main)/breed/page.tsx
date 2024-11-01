@@ -9,6 +9,7 @@ import {
 } from "@/components/api/products/breed";
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
+import { BreedType } from "@/types/ResponseModel/BreedType";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -35,7 +36,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AxiosError, AxiosResponse } from "axios";
 import { v4 as uuidv4 } from 'uuid';
-import { BreedType } from "../../../types/ResponseModel/BreedType";
 
 const formSchema = z.object({
     id:z.string(),

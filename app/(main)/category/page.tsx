@@ -10,6 +10,7 @@ import {
 } from "@/components/api/products/category";
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
+import { CategoryType } from "@/types/ResponseModel/CategoryType";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -35,7 +36,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AxiosError, AxiosResponse } from "axios";
-import { CategoryType } from "../../../types/ResponseModel/CategoryType";
 
 const formSchema = z.object({
   tankType: z.string().min(1, "required"),

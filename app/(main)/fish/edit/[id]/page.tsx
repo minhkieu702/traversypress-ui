@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AxiosError, AxiosResponse } from "axios";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
+import { AwardType } from "@/types/ResponseModel/AwardType";
 
 
 const formSchema = z.object({
