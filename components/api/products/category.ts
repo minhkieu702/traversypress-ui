@@ -1,7 +1,7 @@
 import { baseURL } from "@/components/config";
 import { handleError, normalizeData } from "@/components/helpers/helpers";
-import { CategoryRequestModel } from "@/types/CreateModel/CategoryRequestModel";
 import axios, { AxiosResponse } from "axios";
+import { CategoryRequestModel } from "../../../types/CreateModel/CategoryRequestModel";
 
 axios.interceptors.response.use(response => {
   response.data = normalizeData(response.data);

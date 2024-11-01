@@ -5,13 +5,12 @@ import ProductTable from "@/components/fish/FishsTable";
 import HandlePagination from "@/components/Pagination";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "@/components/ui/use-toast";
-import { FishType } from "@/types/ResponseModel/FishType";
-import { ProductType } from "@/types/ResponseModel/ProductType";
 import { Toast } from "@radix-ui/react-toast";
 import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ProductType } from "../../../types/ResponseModel/ProductType";
 
 const FishPage = () => {
     const [listProductFishes, setListProductFishes] = useState<ProductType[]>();

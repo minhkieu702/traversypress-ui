@@ -1,8 +1,7 @@
 import { baseURL } from "@/components/config";
 import { handleError, normalizeData } from "@/components/helpers/helpers";
-import { BreedRequestModel } from "@/types/CreateModel/BreedRequestModel";
-import { BreedType } from "@/types/ResponseModel/BreedType";
 import axios, { AxiosResponse } from "axios";
+import { BreedRequestModel } from "../../../types/CreateModel/BreedRequestModel";
 axios.interceptors.response.use(response => {
   response.data = normalizeData(response.data);
   return response;

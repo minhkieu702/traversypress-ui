@@ -1,4 +1,3 @@
-import { ProductType } from "@/types/ResponseModel/ProductType";
 import { 
   Table, 
   TableBody, 
@@ -9,6 +8,7 @@ import {
   TableCaption 
 } from '@/components/ui/table';
 import Link from 'next/link';
+import { ProductType } from '../../types/ResponseModel/ProductType';
 
 interface ProductTableProps {
   data: ProductType[],

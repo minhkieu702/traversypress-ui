@@ -4,14 +4,13 @@ import BackButton from "@/components/BackButton"
 import HandlePagination from "@/components/Pagination";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "@/components/ui/use-toast";
-import { TankType } from "@/types/ResponseModel/TankType";
-import { ProductType } from "@/types/ResponseModel/ProductType";
 import { Toast } from "@radix-ui/react-toast";
 import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProductTable from "@/components/fish/FishsTable";
+import { ProductType } from "../../../types/ResponseModel/ProductType";
 
 const TankPage = () => {
     const [listProductTankes, setListProductTankes] = useState<ProductType[]>();

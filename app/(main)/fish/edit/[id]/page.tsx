@@ -24,9 +24,9 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { AxiosError, AxiosResponse } from "axios";
+import { AwardType } from "@/types/ResponseModel/AwardType";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
-import { AwardType } from "@/types/ResponseModel/AwardType";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
