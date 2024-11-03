@@ -4,7 +4,6 @@ import {
   handleGetBreedAPI,
   handlePutBreedAPI,
   handlePostBreedAPI,
-  handleGetBreedPaginationAPI,
 } from "@/components/api/products/breed";
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
@@ -119,7 +118,7 @@ const Page = () => {
   const handleGetBreeds = async () => {
     setLoading(true);
     try {
-      const response = await handleGetBreedPaginationAPI(9, pageNumber);
+      const response = await handleGetBreedAPI(9, pageNumber);
       if (response?.status === 200) {
         setListBreed(response.data);
         getTotalCount(response);
@@ -275,7 +274,7 @@ const Page = () => {
           )}
 
           {totalPage > 1 && (
-            <div className="flex justify-center mt-7">
+            <div className="list-pagination flex items-center md:mt-10 mt-7">
               <HandlePagination
                 onPageChange={handleChangePage}
                 pageCount={totalPage}

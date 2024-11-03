@@ -8,30 +8,14 @@ axios.interceptors.response.use(response => {
   return response;
 });
 
-export const handleGetCategoryAPI = async () => {
+export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: number) => {
     try {
     var res = `${baseURL}/v1/category`
     const response = await axios.get(res, {
-        params:{
-            PageSize: 1999,
-            PageNumber: 1
-        }
-    })
-    return response;
-    } catch (error) {
-      handleError(error)
-      throw new Error(error as string);
+      params:{
+        ...(pageSize && {PageSize: pageSize}),
+        ...(pageNumber && {PageNumber: pageNumber})
     }
-  };
-
-  export const handleGetCategoryPaginationAPI = async (pageSize: number, pageNumber: number) => {
-    try {
-    var res = `${baseURL}/v1/category`
-    const response = await axios.get(res, {
-        params:{
-            PageSize: pageSize,
-            PageNumber: pageNumber
-        }
     })
     return response;
     } catch (error) {

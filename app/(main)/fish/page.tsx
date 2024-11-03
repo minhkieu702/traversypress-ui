@@ -14,6 +14,7 @@ import { Link } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
+import ReactPaginate from "react-paginate";
 
 const FishPage = () => {
   const [listProductFishes, setListProductFishes] = useState<ProductType[]>();
@@ -92,12 +93,8 @@ const FishPage = () => {
           {listProductFishes && (
             <ProductTable data={listProductFishes} type="fish" />
           )}
-          {totalPage > 0 && (
+          {totalPage > 1 && (
             <div className="list-pagination flex items-center md:mt-10 mt-7">
-              <HandlePagination
-                onPageChange={handleChangePage}
-                pageCount={totalPage}
-              />
             </div>
           )}
         </>

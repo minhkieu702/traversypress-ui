@@ -7,13 +7,13 @@ axios.interceptors.response.use(response => {
   response.data = normalizeData(response.data);
   return response;
 });
-export const handleGetBreedAPI = async () => {
+export const handleGetBreedAPI = async (pageSize?: number, pageNumber?: number) => {
     try {
     var res = `${baseURL}/v1/breed`
     const response = await axios.get(res, {
         params:{
-            PageSize: 1999,
-            PageNumber: 1
+            ...(pageSize && {PageSize: pageSize}),
+            ...(pageNumber && {PageNumber: pageNumber})
         }
     })
     console.log("response", response);
@@ -23,22 +23,7 @@ export const handleGetBreedAPI = async () => {
       throw new Error(error as string);
     }
   };
-  export const handleGetBreedPaginationAPI = async (pageSize: number, pageNumber: number) => {
-    try {
-    var res = `${baseURL}/v1/breed`
-    const response = await axios.get(res, {
-        params:{
-            PageSize: pageSize,
-            PageNumber: pageNumber
-        }
-    })
-    console.log("response", response);
-    return response;
-    } catch (error) {
-      handleError(error)
-      throw new Error(error as string);
-    }
-  };
+ 
   export const handlePostBreedAPI = async (data: BreedRequestModel) => {
     try {
       console.log(data);

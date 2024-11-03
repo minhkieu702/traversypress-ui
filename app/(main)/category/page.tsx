@@ -47,7 +47,7 @@ const Page = () => {
 
   const { setValue } = form;
   const [listCategory, setListCategory] = useState<CategoryType[]>([]);
-  const [pageSize, setPageSize] = useState(9);
+  const [pageSize, setPageSize] = useState(1);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalCategories, setTotalCategories] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(1);
@@ -123,7 +123,7 @@ const Page = () => {
   const handleGetCategories = async () => {
     setLoading(true);
     try {
-      const response = await handleGetCategoryAPI();
+      const response = await handleGetCategoryAPI(pageSize, pageNumber);
       if (response?.status === 200) {
         setListCategory(response.data);
         getTotalCount(response);
@@ -262,7 +262,7 @@ const Page = () => {
               </Table>
             </div>
           )}
-          {totalPage > 0 && (
+          {totalPage > 1 && (
             <div className="list-pagination flex items-center md:mt-10 mt-7">
               <HandlePagination
                 onPageChange={handleChangePage}
