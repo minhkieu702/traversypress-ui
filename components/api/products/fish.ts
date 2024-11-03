@@ -125,17 +125,13 @@ export const handlePostProductFishAPI = async (
   try {
     let formData = await addForm(data);
     var res = `${baseURL}/v1/product/fish`;
-    logFormData(formData);
     var jwtToken = localStorage.getItem("jwt");
-    console.log("jwtToken", jwtToken);
-    console.log(res);
     const response = await axios.post(res, formData, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log("response", response);
     return response;
   } catch (error) {
     handleError(error)

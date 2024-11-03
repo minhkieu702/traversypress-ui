@@ -86,20 +86,13 @@ const AddProductFishPage = () => {
     setLoading(true)
     try {
       let response = await handlePostProductTankAPI(data);
-      if (response.status !== 200) {
-        var error = response as AxiosError;
+      if (response.status === 200) {
         toast({
-          title: "Error",
-          content: error.response?.data as string,
+          title: "Adding successful",
+          description: `${data.name} production is added successfully`,
         });
-        setError("Your action is failed, please try again");
-        return;
+        router.push("/tank");
       }
-      toast({
-        title: "Adding successful",
-        description: `${data.name} production is added successfully`,
-      });
-      router.push("/tank");
     } catch (error) {
       setError("Your action is failed, please try again");
       console.log(error);
@@ -124,7 +117,7 @@ const AddProductFishPage = () => {
         </div></>
       ) : (
         <>
-      <BackButton text="Danh mục sản phẩm cá" link="/fish" />
+      <BackButton text="Danh sách sản phẩm cá" link="/fish" />
       <h3 className="text-2xl mb-4">Add New Product</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">

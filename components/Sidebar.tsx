@@ -16,6 +16,9 @@ import {
   CreditCard,
   Settings,
   User,
+  Fish,
+  RectangleHorizontal,
+  PersonStanding,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,11 +34,15 @@ const Sidebar = () => {
             <Link href='/'>Dashboard</Link>
           </CommandItem>
           <CommandItem>
-            <Newspaper className='mr-2 h-4 w-4' />
+            <PersonStanding className='mr-2 h-4 w-4'/>
+            <Link href='/staff'>Staff</Link>
+          </CommandItem>
+          <CommandItem>
+            <Fish className='mr-2 h-4 w-4' />
             <Link href='/fish'>Fish</Link>
           </CommandItem>
           <CommandItem>
-            <Newspaper className='mr-2 h-4 w-4' />
+            <RectangleHorizontal className='mr-2 h-4 w-4' />
             <Link href='/tank'>Tank</Link>
           </CommandItem>
           <CommandItem>

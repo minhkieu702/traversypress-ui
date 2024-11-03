@@ -149,7 +149,7 @@ const AddProductFishPage = () => {
         </div></>
       ) : (
     <>
-      <BackButton text="Danh mục sản phẩm cá" link="/fish" />
+      <BackButton text="Danh sách sản phẩm cá" link="/fish" />
       <h3 className="text-2xl mb-4">Add New Product</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
