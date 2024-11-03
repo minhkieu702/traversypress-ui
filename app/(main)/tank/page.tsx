@@ -81,7 +81,7 @@ const TankPage = () => {
       ) : (
         <>
         <BackButton text='Go Back' link='/' />
-        <button onClick={c => router.push('/tank/add')}>Add new product</button>
+        <button onClick={c => router.push('/tank/add')} className="bg-black text-white font-bold py-2 px-4 rounded text-xs">Add new product</button>
         {
             listProductTankes && <ProductTable data={listProductTankes} type="tank" />
         }

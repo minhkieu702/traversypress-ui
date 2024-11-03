@@ -86,7 +86,7 @@ const FishPage = () => {
       ) : (
         <>
           <BackButton text="Go Back" link="/" />
-          <button onClick={(c) => router.push("/fish/add")}>
+          <button onClick={(c) => router.push("/fish/add")} className="bg-black text-white font-bold py-2 px-4 rounded text-xs">
             Add new product
           </button>
           {listProductFishes && (

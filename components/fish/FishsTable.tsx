@@ -40,7 +40,7 @@ const ProductTable = ({ data, type }: ProductTableProps) => {
               <TableCell className='hidden md:table-cell'>{product.originalPrice?.toLocaleString('vi-VI')} VND</TableCell>
               <TableCell>
                 <Link href={`/${type}/edit/${product.id}`}>
-                  <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs'>
+                  <button className="bg-black text-white font-bold py-2 px-4 rounded text-xs">
                     Edit
                   </button>
                 </Link>

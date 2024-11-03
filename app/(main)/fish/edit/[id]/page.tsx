@@ -160,6 +160,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   }, []);
 
   useEffect(() => {
+    setLoading(true)
     if (fish) {
       if (fish.name) setValue("name", fish.name);
       if (fish.description) setValue("description", fish.description);
@@ -181,6 +182,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
         if (fish.fish.health) setValue("fishModel.health", fish.fish.health);
       }
     }
+    setLoading(false)
   }, [fish, setValue]);
 
   const toggleDeleteImage = (imageId: string) => {
