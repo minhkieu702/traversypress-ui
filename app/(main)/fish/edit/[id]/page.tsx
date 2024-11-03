@@ -27,6 +27,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import { ProductType } from "@/types/ResponseModel/ProductType";
 import { AwardType } from "@/types/ResponseModel/AwardType";
+import { ThreeDots } from "react-loader-spinner";
 
 
 const formSchema = z.object({
@@ -97,6 +98,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const [fish, setFish] = useState<ProductType | null>(null);
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
   const [deleteAward, setDeleteAward] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -110,6 +112,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   const { setValue } = form;
 
   const handleGetBreed = async () => {
+    setLoading(true)
     try {
       let response = await handleGetBreedAPI();
       if (response.status === 200) {
@@ -118,9 +121,11 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     } catch (error) {
       console.log(error);
     }
+    setLoading(false)
   };
 
   const handleGetProductFish = async (id: string) => {
+    setLoading(true)
     try {
       let response = await handleGetProductFishByIdAPI(id);
       if (response.status === 200) {
@@ -146,6 +151,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     } catch (error) {
       console.log(error);
     }
+    setLoading(false)
   };
 
   useEffect(() => {
@@ -199,6 +205,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setLoading(true)
     try {
       const payload = {
         ...data,
@@ -229,9 +236,26 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
     } catch (error) {
       console.error(error);
     }
+    setLoading(false)
   };
 
   return (
+    <>
+      {
+        loading ? (
+          <div className="flex items-center justify-center h-screen">
+          <ThreeDots
+            visible={true}
+            height="80"
+            width="80"
+            color="#000000"
+            radius="9"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            />
+          </div>
+        ):(
     <>
       <BackButton text="Go Back" link="/" />
       <h3 className="text-2xl mb-4">Edit Fish Product</h3>
@@ -659,6 +683,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
           <Button type="submit">Submit</Button>
         </form>
       </Form>
+    </>)}
     </>
   );
 };

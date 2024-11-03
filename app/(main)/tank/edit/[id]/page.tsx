@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AxiosError, AxiosResponse } from "axios";
 import { handleGetCategoryAPI } from "@/components/api/products/category";
 import { CategoryType } from "@/types/ResponseModel/CategoryType";
+import { ThreeDots } from "react-loader-spinner";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -67,7 +68,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
   const [error, setError] = useState<any>();
   const [tank, setTank] = useState<ProductType | null>(null);
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
-
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     // defaultValues:{
@@ -84,18 +85,21 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
   const { setValue } = form;
 
   const handleGetCategory = async () => {
+    setLoading(true)
     try {
       let response = await handleGetCategoryAPI();
       console.log(response);
       if (response.status === 200) {
         setCategory(response.data as CategoryType[]);
       }
+      setLoading(false)
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleGetProductTank = async (id: string) => {
+    setLoading(true)
     try {
       let response = await handleGetProductTankByIdAPI(id);
       console.log(response);
@@ -103,7 +107,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
       if (response.status === 200) {
         var data = response as AxiosResponse;
         setTank(data.data.data as ProductType);
-        
+        setLoading(false)
       } else {
         var error = response as AxiosError;
         toast({
@@ -157,8 +161,6 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
                 }
             });
         })
-        console.log("tankModel.deleteCategories", ids);
-        
         setValue("tankModel.deleteCategories", ids)
     }
   }, [category, tank])
@@ -172,6 +174,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setLoading(true)
     try {
       const payload = {
         ...data,
@@ -193,7 +196,21 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
     }    
   };
 
-  return (
+  return (<>
+    {loading ? (
+      <><div className="flex items-center justify-center h-screen">
+      <ThreeDots
+        visible={true}
+        height="80"
+        width="80"
+        color="#000000"
+        radius="9"
+        ariaLabel="three-dots-loading"
+        wrapperStyle={{}}
+        wrapperClass=""
+        />
+      </div></>
+    ) : (
     <>
       <BackButton text="Go Back" link="/" />
       <h3 className="text-2xl mb-4">Edit Tank Product</h3>
@@ -501,6 +518,7 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
         </form>
       </Form>
     </>
+    )}</>
   );
 };
 

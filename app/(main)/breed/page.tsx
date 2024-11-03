@@ -6,6 +6,7 @@ import {
   handleGetBreedAPI,
   handlePutBreedAPI,
   handlePostBreedAPI,
+  handleGetBreedPaginationAPI,
 } from "@/components/api/products/breed";
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
@@ -21,21 +22,16 @@ import {
   TableRow,
   TableCaption,
 } from "@/components/ui/table";
-import { z } from "zod";
+import { set, z } from "zod";
 import { Form, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AxiosError, AxiosResponse } from "axios";
 import { v4 as uuidv4 } from 'uuid';
+import { Jacquarda_Bastarda_9 } from "next/font/google";
+import { ThreeDots } from "react-loader-spinner";
 
 const formSchema = z.object({
     id:z.string(),
@@ -55,6 +51,7 @@ const Page = () => {
     const [totalPage, setTotalPage] = useState<number>(1);
     const [popup, setPopup] = useState(false);
     const [breed, setBreed] = useState<BreedType | null>(null);
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
   
     useEffect(() => {
@@ -100,9 +97,8 @@ const Page = () => {
 //     }
 //   }
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
+      setLoading(true)
       try {
-        console.log(data);
-        
         const response: AxiosResponse = breed
           ? await handlePutBreedAPI(breed.id, data)
           : await handlePostBreedAPI(data);
@@ -115,6 +111,7 @@ const Page = () => {
           });
           handleClosePopup();
           handleGetBreeds();
+          setLoading(false)
         }
       } catch (error) {
         console.error(error);
@@ -122,11 +119,13 @@ const Page = () => {
     };
   
     const handleGetBreeds = async () => {
+      setLoading(true)
       try {
-        const response = await handleGetBreedAPI();
+        const response = await handleGetBreedPaginationAPI(9, pageNumber);
         if (response?.status === 200) {
           setListBreed(response.data);
           getTotalCount(response);
+          setLoading(false)
         }
       } catch (error) {
         console.error(error);
@@ -148,6 +147,22 @@ const Page = () => {
   
     return (
       <>
+      {
+        loading ? (
+          <><div className="flex items-center justify-center h-screen">
+          <ThreeDots
+            visible={true}
+            height="80"
+            width="80"
+            color="#000000"
+            radius="9"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            />
+          </div></>
+        ):(
+          <>
         <BackButton text="Go Back" link="/" />
         <button onClick={() => handleOpenPopup()}>Add new breed</button>
         {popup && (
@@ -212,6 +227,9 @@ const Page = () => {
             <HandlePagination onPageChange={handleChangePage} pageCount={totalPage} />
           </div>
         )}
+      </>
+        )
+      }
       </>
     );
   };

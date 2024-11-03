@@ -21,6 +21,7 @@ import { BreedType } from "@/types/ResponseModel/BreedType";
 import { handleGetBreedAPI } from "@/components/api/products/breed";
 import { useToast } from "@/components/ui/use-toast";
 import { AxiosError } from "axios";
+import { ThreeDots } from "react-loader-spinner";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
@@ -78,7 +79,7 @@ const AddProductFishPage = () => {
   const { toast } = useToast();
 
   const [breed, setBreed] = useState<BreedType[]>();
-
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -90,21 +91,24 @@ const AddProductFishPage = () => {
   });
 
   useEffect(() => {
-    const handleGetBreed = async () => {
-      try {
-        let response = await handleGetBreedAPI();
-        console.log(response);
-        if (response.status === 200) {
-          setBreed(response.data as BreedType[]);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
     handleGetBreed();
   }, []);
 
+  const handleGetBreed = async () => {
+    setLoading(true)
+    try {
+      let response = await handleGetBreedAPI();
+      if (response.status === 200) {
+        setBreed(response.data as BreedType[]);
+        setLoading(false)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    setLoading(true)
     try {
       let response = await handlePostProductFishAPI(data);
       if (response.status !== 200) {
@@ -129,6 +133,21 @@ const AddProductFishPage = () => {
   };
 
   return (
+    <>
+      {loading ? (
+        <><div className="flex items-center justify-center h-screen">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="#000000"
+          radius="9"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          />
+        </div></>
+      ) : (
     <>
       <BackButton text="Danh mục sản phẩm cá" link="/fish" />
       <h3 className="text-2xl mb-4">Add New Product</h3>
@@ -576,6 +595,9 @@ const AddProductFishPage = () => {
         </form>
       </Form>
     </>
+    )
+  }
+  </>
   );
 };
 

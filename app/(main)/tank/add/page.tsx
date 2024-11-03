@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AxiosError } from "axios";
 import { handleGetCategoryAPI } from "@/components/api/products/category";
 import { handlePostProductTankAPI } from "@/components/api/products/tank";
+import { ThreeDots } from "react-loader-spinner";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
@@ -53,7 +54,7 @@ const AddProductFishPage = () => {
   const { toast } = useToast();
 
   const [category, setCategory] = useState<CategoryType[]>([]);
-
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,21 +65,25 @@ const AddProductFishPage = () => {
   });
 
   useEffect(() => {
-    const handleGetCategory = async () => {
-      try {
-        let response = await handleGetCategoryAPI();
-        console.log(response);
-        if (response.status === 200) {
-          setCategory(response.data as CategoryType[]);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
     handleGetCategory();
   }, []);
 
+  const handleGetCategory = async () => {
+    setLoading(true)
+    try {
+      let response = await handleGetCategoryAPI();
+      console.log(response);
+      if (response.status === 200) {
+        setCategory(response.data as CategoryType[]);
+        setLoading(false)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    setLoading(true)
     try {
       let response = await handlePostProductTankAPI(data);
       if (response.status !== 200) {
@@ -104,6 +109,21 @@ const AddProductFishPage = () => {
 
   return (
     <>
+      {loading ? (
+        <><div className="flex items-center justify-center h-screen">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="#000000"
+          radius="9"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          />
+        </div></>
+      ) : (
+        <>
       <BackButton text="Danh mục sản phẩm cá" link="/fish" />
       <h3 className="text-2xl mb-4">Add New Product</h3>
       <Form {...form}>
@@ -355,6 +375,7 @@ const AddProductFishPage = () => {
         </form>
       </Form>
     </>
+      )}</>
   );
 };
 

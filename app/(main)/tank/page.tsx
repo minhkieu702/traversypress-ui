@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProductTable from "@/components/fish/FishsTable";
 import { getTotalCount } from "@/helpers/helpers";
+import { ThreeDots } from "react-loader-spinner";
 
 const TankPage = () => {
     const [listProductTankes, setListProductTankes] = useState<ProductType[]>();
@@ -19,7 +20,7 @@ const TankPage = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [totalProduct, setTotalProduct] = useState<number>(0);
     const [totalPage, setTotalPage] = useState<number>(1);
-    
+    const [loading, setLoading] = useState(false);
     const router = useRouter()
     useEffect(() => {
         handleGetProduct()
@@ -30,6 +31,7 @@ const TankPage = () => {
     }, [totalProduct])
 
     const handleGetProduct = async () => {
+        setLoading(true)
         try {
             console.log("page number", pageNumber);
             
@@ -40,6 +42,7 @@ const TankPage = () => {
             console.log("listporudct", listporudct);
             setListProductTankes(listporudct)
             setTotalProduct(getTotalCount(response));
+            setLoading(false)
             return
         }
         else {
@@ -62,6 +65,21 @@ const TankPage = () => {
       };
     return(
         <>
+      {loading ? (
+        <><div className="flex items-center justify-center h-screen">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="#000000"
+          radius="9"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          />
+        </div></>
+      ) : (
+        <>
         <BackButton text='Go Back' link='/' />
         <button onClick={c => router.push('/tank/add')}>Add new product</button>
         {
@@ -73,6 +91,9 @@ const TankPage = () => {
             </div>
         }
         </>
+      )
+    }
+    </>
     )
 }
 

@@ -36,6 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AxiosError, AxiosResponse } from "axios";
+import { ThreeDots } from "react-loader-spinner";
 
 const formSchema = z.object({
   tankType: z.string().min(1, "required"),
@@ -54,6 +55,8 @@ const Page = () => {
     const [totalPage, setTotalPage] = useState<number>(1);
     const [popup, setPopup] = useState(false);
     const [category, setCategory] = useState<CategoryType | null>(null);
+    const [loading, setLoading] = useState(false);
+    
     const router = useRouter();
   
     useEffect(() => {
@@ -82,6 +85,7 @@ const Page = () => {
       form.reset();
     };
   const handleDeleteItem = async (id: string) => {
+    setLoading(true)
     try {
         let response = await handleDeleteCategoryAPI(id)
     if (response.status === 200) {
@@ -91,15 +95,15 @@ const Page = () => {
           });
     }          
     handleGetCategories();
+    setLoading(false)
     } catch (error) {
         console.log(error);
         
     }
   }
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
+      setLoading(true)
       try {
-        console.log(data);
-        
         const response: AxiosResponse = category
           ? await handlePatchCategoryAPI(category.id, data)
           : await handlePostCategoryAPI(data);
@@ -112,6 +116,7 @@ const Page = () => {
           });
           handleClosePopup();
           handleGetCategories();
+          setLoading(false)
         }
       } catch (error) {
         console.error(error);
@@ -119,11 +124,13 @@ const Page = () => {
     };
   
     const handleGetCategories = async () => {
+      setLoading(true)
       try {
         const response = await handleGetCategoryAPI();
         if (response?.status === 200) {
           setListCategory(response.data);
           getTotalCount(response);
+          setLoading(false)
         }
       } catch (error) {
         console.error(error);
@@ -144,6 +151,21 @@ const Page = () => {
     };
   
     return (
+      <>
+      {loading ? (
+        <><div className="flex items-center justify-center h-screen">
+        <ThreeDots
+          visible={true}
+          height="80"
+          width="80"
+          color="#000000"
+          radius="9"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          />
+        </div></>
+      ) : (
       <>
         <BackButton text="Go Back" link="/" />
         <button onClick={() => handleOpenPopup()}>Add new category</button>
@@ -212,6 +234,9 @@ const Page = () => {
           </div>
         )}
       </>
+      )
+    }
+    </>
     );
   };
   
