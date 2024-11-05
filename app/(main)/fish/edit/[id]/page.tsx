@@ -155,9 +155,21 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
   };
 
   useEffect(() => {
-    handleGetBreed();
-    handleGetProductFish(params.id);
-  }, []);
+    const fetchData = async () => {
+      setLoading(true); // Đặt loading trước khi fetch dữ liệu
+  
+      try {
+        await handleGetBreed();
+        await handleGetProductFish(params.id);
+      } catch (error) {
+        console.log(error);
+      }
+  
+      setLoading(false); // Đặt loading về false sau khi dữ liệu đã được load
+    };
+  
+    fetchData();
+  }, [params.id]);
 
   useEffect(() => {
     setLoading(true)
