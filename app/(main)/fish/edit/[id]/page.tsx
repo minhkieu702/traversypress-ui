@@ -139,8 +139,8 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
           awardDate: award.awardDate,
         }));
         console.log(awards);
-
         setValue("fishModel.fishAward", awards || []);
+        setLoading(false)
       } else {
         var error = response as AxiosError;
         toast({
