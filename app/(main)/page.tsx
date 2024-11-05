@@ -22,10 +22,13 @@ export default function Home() {
   const [tankCount, setTankCount] = useState(0);
   const [breedCount, setBreedCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
+  const [month, setMonth] = useState(0);
+  
 const [loading, setLoading] = useState(false);
 const [year, setYear] = useState<number>(currentYear);
   
 const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) => 2021 + i);
+const months = [1, 2, 3, 4, 5, 6, 7,8, 9, 10,11, 12, 0]
 
   useEffect(() => {
     setLoading(true)
@@ -134,6 +137,10 @@ const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) => 2021 + i)
     setYear(parseInt(event.target.value));
   };
 
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setMonth(parseInt(event.target.value));
+  };
+
   return (
     <>
     {loading ? (
@@ -202,8 +209,21 @@ const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) => 2021 + i)
           </option>
         ))}
       </select>
+      <label htmlFor="month" className="font-medium mr-2">Select Month:</label>
+      <select
+        id="month"
+        value={month}
+        onChange={handleMonthChange}
+        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        {months.map((y) => (
+          <option key={y} value={y}>
+            {y}
+          </option>
+        ))}
+      </select>
     </div>
-      <AnalyticsChart year={year} />
+      <AnalyticsChart year={year} month={month} />
       {/* <PostsTable title="Latest Posts" limit={5} /> */}
     </>
     )}
