@@ -1,6 +1,6 @@
 "use client";
 
-import { handlePostStaffAPI } from "@/components/api/staff/staff";
+import { handlePostStaffAPI } from "@/components/api/person/staff";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import {

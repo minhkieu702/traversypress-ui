@@ -16,11 +16,16 @@ import { BreedType } from "@/types/ResponseModel/BreedType";
 import { handleGetBreedAPI } from "@/components/api/products/breed";
 import { ThreeDots } from "react-loader-spinner";
 export default function Home() {
+  const currentYear = new Date().getFullYear();
+
   const [fishCount, setFishCount] = useState(0);
   const [tankCount, setTankCount] = useState(0);
   const [breedCount, setBreedCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
 const [loading, setLoading] = useState(false);
+const [year, setYear] = useState<number>(currentYear);
+  
+const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) => 2021 + i);
 
   useEffect(() => {
     setLoading(true)
@@ -124,6 +129,11 @@ const [loading, setLoading] = useState(false);
       console.log(error);
     }
   }
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setYear(parseInt(event.target.value));
+  };
+
   return (
     <>
     {loading ? (
@@ -178,8 +188,23 @@ const [loading, setLoading] = useState(false);
           icon={<MessageCircle className="text-slate-500" size={72} />}
         /> */}
       </div>
-      <AnalyticsChart />
-      <PostsTable title="Latest Posts" limit={5} />
+      <div>
+      <label htmlFor="year" className="font-medium mr-2">Select Year:</label>
+      <select
+        id="year"
+        value={year}
+        onChange={handleYearChange}
+        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        {years.map((y) => (
+          <option key={y} value={y}>
+            {y}
+          </option>
+        ))}
+      </select>
+    </div>
+      <AnalyticsChart year={year} />
+      {/* <PostsTable title="Latest Posts" limit={5} /> */}
     </>
     )}
     </>
