@@ -11,3 +11,8 @@ export interface Day {
     customerCount: number,
     customers: CustomerType[]
 }
+
+export interface CustomersPerMonth{
+    totalCustomers: number,
+    customersGroupByWeek: CustomersGroupByWeek[]
+}

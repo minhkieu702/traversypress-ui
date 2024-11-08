@@ -5,3 +5,8 @@ export interface CustomersGroupByYear {
     customerCount: number,
     customers: CustomerType[]
 }
+
+export interface CustomersPerYear {
+  totalCustomes: number;
+  customersGroupByYear: CustomersGroupByYear[];
+}

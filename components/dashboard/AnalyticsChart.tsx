@@ -15,156 +15,110 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-import data from "@/data/analytics";
-import { CustomerType } from "@/types/ResponseModel/CustomerType";
 import { useEffect, useState } from "react";
 import { handleGetCustomerAPI } from "../api/person/customer";
-import { AxiosResponse } from "axios";
-import { log } from "console";
-import { CustomersGroupByYear } from "@/types/ResponseModel/CustomersGroupByYear";
+import { handleGetOrderAPI } from "../api/order/order";
 import { ThreeDots } from "react-loader-spinner";
-import { CustomersGroupByWeek } from "@/types/ResponseModel/CustomersGroupByWeek";
+import { AxiosResponse } from "axios";
+import { SalesPerYear } from "@/types/ResponseModel/SalesGroupByYear";
 
-interface DataPerYear {
+interface CustomersPerYear {
   totalCustomes: number;
-  customersGroupByYear: CustomersGroupByYear[];
+  customersGroupByYear: { month: number; customerCount: number }[];
 }
-interface DataPerMonth {
-  totalCustomes: number;
-  customersGroupByWeek: CustomersGroupByWeek[];
+
+interface SalesGroupByYear {
+  totalSales: number;
+  salesGroupByMonth: { month: number; sales: number }[];
 }
+
 interface AnalyticsChartProps {
   year: number;
   month: number;
 }
+
 const AnalyticsChart = ({ year, month }: AnalyticsChartProps) => {
-  const [dataIsYear, setDataIsYear] = useState<DataPerYear>();
-  const [dataIsMonth, setDataIsMonth] = useState<DataPerMonth>();
-
+  const [data, setData] = useState<{
+    yearData?: { customer: CustomersPerYear; sales: SalesPerYear };
+    monthData?: any; // Define as per month structure
+  }>({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleGetCustomerPerYear = async () => {
+  const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      var response = await handleGetCustomerAPI(year, month);
-      if (response?.status === 200) {
-        var content = response as AxiosResponse;
-        let list = content.data.data as DataPerYear;
-        console.log(list);
-        setDataIsMonth(undefined);
-        setDataIsYear(list);
-        setLoading(false);
+      const [customersResponse, salesResponse] = await Promise.all([
+        handleGetCustomerAPI(year, month),
+        handleGetOrderAPI(year, month),
+      ]);
+
+      if (customersResponse?.status === 200 && salesResponse?.status === 200) {
+        const customerData = (customersResponse as AxiosResponse).data.data;
+        const salesData = (salesResponse as AxiosResponse).data.data;
+
+        setData({
+          yearData: month === 0 ? { customer: customerData, sales: salesData } : undefined,
+          monthData: month !== 0 ? { customer: customerData, sales: salesData } : undefined,
+        });
+        console.log("salesData", data.yearData?.sales);
+
       }
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const handleGetCustomerPerMonth = async () => {
-    setLoading(true);
-    try {
-      var response = await handleGetCustomerAPI(year, month);
-      if (response?.status === 200) {
-        var content = response as AxiosResponse;
-        let list = content.data.data as DataPerMonth;
-        setDataIsMonth(list);
-        setDataIsYear(undefined);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log(error);
+      setError("Failed to fetch data. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (month === 0) {
-      handleGetCustomerPerYear();
-    } else {
-      handleGetCustomerPerMonth();
-    }
+    fetchData();
   }, [year, month]);
+
+  const renderChart = (data: any, dataKey: string, xAxisKey: string) => (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <Line type="monotone" dataKey={dataKey} stroke="#8884d8" />
+        <CartesianGrid stroke="#ccc" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+      </LineChart>
+    </ResponsiveContainer>
+  );
 
   return (
     <>
       {loading ? (
-        <>
-          <div className="flex items-center justify-center h-screen">
-            <ThreeDots
-              visible={true}
-              height="80"
-              width="80"
-              color="#000000"
-              radius="9"
-              ariaLabel="three-dots-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-          </div>
-        </>
+        <div className="flex items-center justify-center h-screen">
+          <ThreeDots visible={true} height="80" width="80" color="#000000" />
+        </div>
+      ) : error ? (
+        <div className="text-center text-red-500">{error}</div>
       ) : (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics For This Year</CardTitle>
-              <CardDescription>Registrations Per Month</CardDescription>
-            </CardHeader>
-            {dataIsYear?.totalCustomes == 0 ? (
-              <>Không có dữ liệu</>
-            ) : month === 0 ? (
-              <CardContent>
-                <div style={{ width: "100%", height: 300 }}>
-                  <ResponsiveContainer>
-                    <LineChart
-                      width={12}
-                      height={dataIsYear?.totalCustomes}
-                      data={dataIsYear?.customersGroupByYear}
-                    >
-                      <Line
-                        type="monotone"
-                        dataKey="customerCount"
-                        stroke="#8884d8"
-                      />
-                      <CartesianGrid stroke="#ccc" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            ) : (
-              <CardContent>
-                <div style={{ width: "100%", height: 300 }}>
-                  <ResponsiveContainer>
-                    <LineChart
-                      width={12}
-                      height={dataIsMonth?.totalCustomes}
-                      data={dataIsMonth?.customersGroupByWeek}
-                    >
-                      <Line
-                        type="monotone"
-                        dataKey="customersCount" // Update to match data structure
-                        stroke="#8884d8"
-                      />
-                      <CartesianGrid stroke="#ccc" />
-                      <XAxis dataKey="week" />{" "}
-                      {/* Set X-axis to display week numbers */}
-                      <YAxis
-                        label={{
-                          value: "Customers",
-                          angle: -90,
-                          position: "insideLeft",
-                        }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        </>
+        <Card>
+          <CardHeader>
+            <CardTitle>Analytics For {month === 0 ? "This Year" : "This Month"}</CardTitle>
+            <CardDescription>{month === 0 ? "Registrations Per Month" : "Registrations Per Week"}</CardDescription>
+          </CardHeader>
+          {data.yearData ? (
+            <>
+              <CardContent>{renderChart(data.yearData.customer.customersGroupByYear, "customerCount", "month")}</CardContent>
+              <CardContent>{renderChart(data.yearData.sales.salesGroupByMoth, "orders", "month")}</CardContent>
+            </>
+          ) : data.monthData ? (
+            <>
+              <CardContent>{renderChart(data.monthData.customer.customersGroupByWeek, "customersCount", "week")}</CardContent>
+              <CardContent>{renderChart(data.monthData.sales.sales, "sales", "week")}</CardContent>
+            </>
+          ) : (
+            <div className="text-center">No data available.</div>
+          )}
+        </Card>
       )}
     </>
   );
 };
+
 export default AnalyticsChart;

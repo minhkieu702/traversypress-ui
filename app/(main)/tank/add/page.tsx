@@ -40,7 +40,7 @@ const formSchema = z.object({
     (val) => Number(val),
     z.number().min(1).positive("Original Price must be greater than 0")
   ),
-  imageFiles: z.array(z.any()).optional(), // Ảnh sản phẩm, có thể là tệp upload
+  imageFiles: z.array(z.any()).min(3, "Please upload at least 3 images").optional(),
   tankModel: z.object({
     size: z.string().min(1, "Size is required"),
     sizeInformation: z.string().min(1, "Size information is required"),
