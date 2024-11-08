@@ -35,27 +35,27 @@ const Sidebar = () => {
           </CommandItem>
           <CommandItem>
             <PersonStanding className='mr-2 h-4 w-4'/>
-            <Link href='/staff'>Staff</Link>
+            <Link href='/staff'>Nhân Viên</Link>
           </CommandItem>
           <CommandItem>
             <Fish className='mr-2 h-4 w-4' />
-            <Link href='/fish'>Fish</Link>
+            <Link href='/fish'>Cá Cảnh</Link>
           </CommandItem>
           <CommandItem>
             <RectangleHorizontal className='mr-2 h-4 w-4' />
-            <Link href='/tank'>Tank</Link>
+            <Link href='/tank'>Hồ Cá</Link>
           </CommandItem>
           <CommandItem>
             <Newspaper className='mr-2 h-4 w-4' />
-            <Link href='/posts'>Posts</Link>
+            <Link href='/posts'>Bài Đăng</Link>
           </CommandItem>
           <CommandItem>
             <Folders className='mr-2 h-4 w-4' />
-            <Link href='/category'>Categories</Link>
+            <Link href='/category'>Loại Hồ Cá</Link>
           </CommandItem>
           <CommandItem>
             <Folders className='mr-2 h-4 w-4' />
-            <Link href='/breed'>Breeds</Link>
+            <Link href='/breed'>Giống Cá</Link>
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />

@@ -10,7 +10,7 @@ axios.interceptors.response.use(response => {
 
 export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: number) => {
     try {
-    var res = `${baseURL}/v1/category`
+    var res = `${baseURL}/v1/tankcategory`
     const response = await axios.get(res, {
       params:{
         ...(pageSize && {PageSize: pageSize}),
@@ -26,7 +26,7 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
 
   export const handlePostCategoryAPI = async (data: CategoryRequestModel) => {
     try {
-      var res = `${baseURL}/v1/category`
+      var res = `${baseURL}/v1/tankcategory`
       console.log(res);
       
       const response = await axios.post(res, data)      
@@ -39,7 +39,7 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
 
   export const handlePatchCategoryAPI = async (id: string, data: CategoryRequestModel) => {
     try {
-      var res = `${baseURL}/v1/category/${id}`
+      var res = `${baseURL}/v1/tankcategory/${id}`
       console.log(res);
       const response = await axios.patch(res, data)
       return response
@@ -51,7 +51,7 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
 
   export const handleDeleteCategoryAPI = async (id: string) => {
     try {
-      var res = `${baseURL}/v1/category/${id}`
+      var res = `${baseURL}/v1/tankcategory/${id}`
       console.log(res);
       const response = await axios.delete(res)
       return response

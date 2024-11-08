@@ -150,9 +150,9 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
   }, [tank, setValue]);
 
   useEffect(() => {
-    if (category && tank?.tank) {
+    if (category && tank?.tank?.categories) {
         let ids: string[] = []
-        let i = 0;
+        let i = 0;        
         category.forEach((cat, index) => {
             tank.tank?.categories.forEach(picked => {
                 if (picked.id !== cat.id) {
