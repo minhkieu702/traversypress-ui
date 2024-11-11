@@ -18,7 +18,6 @@ export const handleGetBreedAPI = async (pageSize?: number, pageNumber?: number) 
         },
         headers:{
           Authorization: `Bearer ${jwtToken()}`,
-          "Content-Type": "multipart/form-data",
         }
     })
     console.log("response", response);
@@ -35,7 +34,6 @@ export const handleGetBreedAPI = async (pageSize?: number, pageNumber?: number) 
       const response = await axios.post(res, data, {
         headers: {
           Authorization: `Bearer ${jwtToken()}`,
-          "Content-Type": "multipart/form-data",
         }
       })
       return response
@@ -52,7 +50,6 @@ export const handleGetBreedAPI = async (pageSize?: number, pageNumber?: number) 
       const response = await axios.put(res, data, {
         headers: {
           Authorization: `Bearer ${jwtToken()}`,
-          "Content-Type": "multipart/form-data",
         }
       })
       return response

@@ -17,7 +17,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     }
     const decoded = jwtDecode<CustomJwtPayload>(token);
     console.log("ClientTokenChecker", token);
-    if (decoded.role !== "Admin") {
+    if (decoded.role !== "Admin" && decoded.role !== "Staff") {
       router.push("/auth");
     }
     if (decoded.exp && Date.now() >= decoded.exp * 1000) {

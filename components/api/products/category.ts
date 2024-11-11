@@ -18,7 +18,6 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
     },
     headers: {
       Authorization: `Bearer ${jwtToken()}`,
-      "Content-Type": "multipart/form-data",
     }
     })
     return response;
@@ -36,7 +35,6 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
       const response = await axios.post(res, data, {
         headers: {
           Authorization: `Bearer ${jwtToken()}`,
-          "Content-Type": "multipart/form-data",
         }
       })      
       return response
@@ -53,7 +51,6 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
       const response = await axios.patch(res, data,{
         headers: {
           Authorization: `Bearer ${jwtToken()}`,
-          "Content-Type": "multipart/form-data",
         }
       })
       return response
@@ -70,7 +67,6 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
       const response = await axios.delete(res,{
         headers: {
           Authorization: `Bearer ${jwtToken()}`,
-          "Content-Type": "multipart/form-data",
         }
       })
       return response

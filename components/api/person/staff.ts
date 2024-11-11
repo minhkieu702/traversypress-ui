@@ -29,7 +29,6 @@ export const handleGetStaffAPI = async (pageSize?: number, pageNumber?: number, 
   const response = await axios.get(res, {
     headers: {
       Authorization: `Bearer ${jwtToken()}`,
-      "Content-Type": "multipart/form-data",
     },
     params:{
       ...(pageSize && {PageSize: pageSize}),
