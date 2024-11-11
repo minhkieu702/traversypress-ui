@@ -8,7 +8,7 @@ import { Award } from "lucide-react";
 import { describe } from "node:test";
 import { any, string } from "zod";
 import { v4 as uuidv4 } from 'uuid';
-import { convertImageListToBinaryStrings, handleError, logFormData, normalizeData } from "@/helpers/helpers";
+import { convertImageListToBinaryStrings, handleError, jwtToken, logFormData, normalizeData } from "@/helpers/helpers";
 
 axios.interceptors.response.use(response => {
   response.data = normalizeData(response.data);
@@ -125,10 +125,9 @@ export const handlePostProductFishAPI = async (
   try {
     let formData = await addForm(data);
     var res = `${baseURL}/v1/product/fish`;
-    var jwtToken = localStorage.getItem("jwt");
     const response = await axios.post(res, formData, {
       headers: {
-        Authorization: `Bearer ${jwtToken}`,
+        Authorization: `Bearer ${jwtToken()}`,
         "Content-Type": "multipart/form-data",
       },
     });
@@ -157,6 +156,9 @@ export const handleGetProductFishAPI = async (
         ...(sort && { Sort: sort }),
         ...(direction && { Direction: direction }),
       },
+        headers: {
+          Authorization: `Bearer ${jwtToken()}`,
+        }
     });
     return response;
   } catch (error) {
@@ -167,7 +169,11 @@ export const handleGetProductFishAPI = async (
 
 export const handleGetProductFishByIdAPI = async (id: string) => {
   try {
-    const response = await axios.get(`${baseURL}/v1/product/fish/${id}`);
+    const response = await axios.get(`${baseURL}/v1/product/fish/${id}`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken()}`,
+      }
+    });
     return response;
   } catch (error) {
     handleError(error)
@@ -182,11 +188,9 @@ export const hanldePatchProductFishAPI = async (
   try {
     let formData = await updateForm(data);
     var res = `${baseURL}/v1/product/fish/${id}`;
-    
-    var jwtToken = localStorage.getItem("jwt");
     const response = await axios.patch(res, formData, {
       headers: {
-        Authorization: `Bearer ${jwtToken}`,
+        Authorization: `Bearer ${jwtToken()}`,
         "Content-Type": "multipart/form-data",
       },
     });

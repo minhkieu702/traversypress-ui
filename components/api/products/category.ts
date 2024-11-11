@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { handleError, normalizeData } from "@/helpers/helpers";
+import { handleError, jwtToken, normalizeData } from "@/helpers/helpers";
 import { CategoryRequestModel } from "@/types/CreateModel/CategoryRequestModel";
 import axios, { AxiosResponse } from "axios";
 
@@ -15,6 +15,10 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
       params:{
         ...(pageSize && {PageSize: pageSize}),
         ...(pageNumber && {PageNumber: pageNumber})
+    },
+    headers: {
+      Authorization: `Bearer ${jwtToken()}`,
+      "Content-Type": "multipart/form-data",
     }
     })
     return response;
@@ -29,7 +33,12 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
       var res = `${baseURL}/v1/tankcategory`
       console.log(res);
       
-      const response = await axios.post(res, data)      
+      const response = await axios.post(res, data, {
+        headers: {
+          Authorization: `Bearer ${jwtToken()}`,
+          "Content-Type": "multipart/form-data",
+        }
+      })      
       return response
     } catch (error) {
       handleError(error)
@@ -41,7 +50,12 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
     try {
       var res = `${baseURL}/v1/tankcategory/${id}`
       console.log(res);
-      const response = await axios.patch(res, data)
+      const response = await axios.patch(res, data,{
+        headers: {
+          Authorization: `Bearer ${jwtToken()}`,
+          "Content-Type": "multipart/form-data",
+        }
+      })
       return response
     } catch (error) {
       handleError(error)
@@ -53,7 +67,12 @@ export const handleGetCategoryAPI = async (pageSize?: number, pageNumber?: numbe
     try {
       var res = `${baseURL}/v1/tankcategory/${id}`
       console.log(res);
-      const response = await axios.delete(res)
+      const response = await axios.delete(res,{
+        headers: {
+          Authorization: `Bearer ${jwtToken()}`,
+          "Content-Type": "multipart/form-data",
+        }
+      })
       return response
     } catch (error) {
       handleError(error)

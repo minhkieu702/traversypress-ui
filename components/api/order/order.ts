@@ -15,8 +15,7 @@ export const handleGetOrderAPI = async (
           res,
           {
             headers: {
-              Authorization: `Bearer ${jwtToken}`,
-              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${jwtToken}`
             },
             params: {
               year: year
@@ -31,8 +30,7 @@ export const handleGetOrderAPI = async (
           res,
           {
             headers: {
-              Authorization: `Bearer ${jwtToken}`,
-              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${jwtToken}`
             },
             params: {
               year: year,

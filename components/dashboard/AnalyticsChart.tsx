@@ -7,6 +7,8 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
+  AreaChart,
+  Area,
 } from "recharts";
 import {
   Card,
@@ -79,12 +81,12 @@ const AnalyticsChart = ({ year, month }: AnalyticsChartProps) => {
 
   const renderChart = (data: any, dataKey: string, xAxisKey: string) => (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <Line type="monotone" dataKey={dataKey} stroke="#8884d8" />
-        <CartesianGrid stroke="#ccc" />
+      <AreaChart data={data}>
+        <Area type="monotone" dataKey={dataKey} stroke="#8884d8" />
+        <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={xAxisKey} />
         <YAxis />
-      </LineChart>
+      </AreaChart>
     </ResponsiveContainer>
   );
 

@@ -1,6 +1,10 @@
 import axios from "axios";
 import { toast } from "../components/ui/use-toast";
 
+export const jwtToken = () => {
+  return localStorage.getItem("jwt");
+}
+
 const convertToBinaryString = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -67,6 +71,10 @@ let message = ''
         description: message
       })
     }
+    toast({
+      title: "Error",
+      description: "Your action failed"
+    })
   }
 };
 

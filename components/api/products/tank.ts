@@ -1,5 +1,5 @@
 import { baseURL } from "@/components/config";
-import { handleError, logFormData, normalizeData } from "@/helpers/helpers";
+import { handleError, jwtToken, logFormData, normalizeData } from "@/helpers/helpers";
 import { TankProductCreateModel } from "@/types/CreateModel/TankProductCreateModel";
 import { TankProductUpdateModel } from "@/types/UpdateModel/TankProductUpdateModel";
 import axios, { AxiosError } from "axios";
@@ -100,6 +100,9 @@ const addForm = async (data: TankProductCreateModel) => {
           ...(sort && { Sort: sort }),
           ...(direction && { Direction: direction }),
         },
+        headers: {
+          Authorization: `Bearer ${jwtToken()}`
+        }
       });
       return response;
     } catch (error) {
@@ -110,7 +113,11 @@ const addForm = async (data: TankProductCreateModel) => {
 
   export const handleGetProductTankByIdAPI = async (id: string) => {
     try {
-      const response = await axios.get(`${baseURL}/v1/product/tank/${id}`);
+      const response = await axios.get(`${baseURL}/v1/product/tank/${id}`, {
+        headers: {
+          Authorization: `Bearer ${jwtToken()}`
+        }
+      });
       return response;
     } catch (error) {
       handleError(error)
@@ -155,7 +162,6 @@ const addForm = async (data: TankProductCreateModel) => {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("response", response);
       return response;
     } catch (error) {
       handleError(error)
