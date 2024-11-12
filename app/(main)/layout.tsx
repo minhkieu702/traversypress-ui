@@ -16,7 +16,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     const decoded = jwtDecode<CustomJwtPayload>(token);
-    console.log("ClientTokenChecker", token);
     if (decoded.role !== "Admin" && decoded.role !== "Staff") {
       router.push("/auth");
     }

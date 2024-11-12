@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { AxiosError, AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import { StaffResponseModel } from "@/types/ResponseModel/StaffType";
-import { handleGetStaffAPI, handlePostStaffAPI } from "@/components/api/person/staff";
+import { handleGetStaffAPI, handlePatchStaffAPI, handlePostStaffAPI } from "@/components/api/person/staff";
 import { StaffRequestModel } from "@/types/CreateModel/StaffRequestModel";
 import data from "@/data/analytics";
 
@@ -62,9 +62,10 @@ const Page = () => {
     setTotalPage(Math.ceil(totalCategories / pageSize));
   }, [totalCategories, pageSize]);
 
-  const handleOpenPopup = () => {
+  const handleOpenPopup = (staff?: StaffResponseModel) => {
     setPopup(true);
     if (staff) {
+      console.log("edit", staff)
       setStaff(staff);
       setValue("facebook", staff.facebook || '');
       setValue("fullname", staff.fullName);
@@ -123,6 +124,23 @@ const response = await handlePostStaffAPI(requestModel);
     setLoading(false);
   }
 };
+
+const handleBeAdmin = async (staffId: string) => {
+  try{
+    var response = await handlePatchStaffAPI(staffId)
+  if (response.status === 200) {
+    toast({
+      title: "Successful",
+      description: `${staffId} is now admin`,
+    });
+    handleClosePopup();
+    handleGetStaffs();
+  }
+} catch (error) {
+} finally {
+  setLoading(false);
+}
+}
 
   const handleGetStaffs = async () => {
     setLoading(true);
@@ -238,6 +256,7 @@ const response = await handlePostStaffAPI(requestModel);
                     <TableHead>User Name</TableHead>
                     <TableHead>Full Name</TableHead>
                     <TableHead>Create At</TableHead>
+                    <TableHead>Is Admin</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -250,20 +269,10 @@ const response = await handlePostStaffAPI(requestModel);
                       <TableCell className="hidden md:table-cell">
                         {product.createdAt}
                       </TableCell>
-                      <TableCell>
-                        <button
-                          className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
-                          onClick={() => handleOpenPopup()}
-                        >
-                          Edit
+                      <TableCell className="hidden md:table-cell">
+                        <button onClick={() => handleBeAdmin(product.id)} disabled={product.isAdmin}  className={`py-2 px-4 rounded font-bold ${product.isAdmin ? "bg-gray-400 text-white cursor-not-allowed" : "bg-black text-white"}`}>
+                          Update Role
                         </button>
-                        <>{" "}</>
-                        {/* <button
-                          className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
-                          onClick={() => handleDeleteItem(product.id)}
-                        >
-                          Delete
-                        </button> */}
                       </TableCell>
                     </TableRow>
                   ))}
