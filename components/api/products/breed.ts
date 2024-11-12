@@ -20,7 +20,6 @@ export const handleGetBreedAPI = async (pageSize?: number, pageNumber?: number) 
           Authorization: `Bearer ${jwtToken()}`,
         }
     })
-    console.log("response", response);
     return response;
     } catch (error) {
       handleError(error)

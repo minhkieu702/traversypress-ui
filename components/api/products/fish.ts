@@ -124,6 +124,7 @@ export const handlePostProductFishAPI = async (
 ) => {
   try {
     let formData = await addForm(data);
+    logFormData(formData)
     var res = `${baseURL}/v1/product/fish`;
     const response = await axios.post(res, formData, {
       headers: {

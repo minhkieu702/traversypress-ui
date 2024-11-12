@@ -23,56 +23,68 @@ import { useToast } from "@/components/ui/use-toast";
 import { AxiosError } from "axios";
 import { ThreeDots } from "react-loader-spinner";
 
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
-  description: z.string().min(1, "Description is required"), // Mô tả
-  descriptionDetail: z.string(), // Mô tả chi tiết, có thể không bắt buộc
-  stockQuantity: z.preprocess(
-    (val) => Number(val),
-    z.number().min(1, "Stock must be a positive number")
-  ), // chuyển chuỗi thành số
-  price: z.preprocess(
-    (val) => Number(val),
-    z.number().min(1).positive("Price must be greater than 0")
-  ),
-  originalPrice: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z.number().positive().optional()
-  ),
-  imageFiles: z.array(z.any()).optional(), // Ảnh sản phẩm, có thể là tệp upload
-  fishModel: z.object({
-    breedId: z.string().min(1, "Breed ID is required"), // Mã giống cá
-    size: z.preprocess(
-      (val) => Number(val),
-      z.number().positive("Size must be greater than 0")
+const formSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"), // Tên cá, yêu cầu bắt buộc
+    description: z.string().min(1, "Description is required"), // Mô tả
+    descriptionDetail: z.string(), // Mô tả chi tiết, có thể không bắt buộc
+    stockQuantity: z.preprocess(
+      (val) => (val === "" ? 0 : Number(val)),
+      z.number().min(0, "Stock must be 0 or a positive number")
     ),
-    age: z.preprocess(
-      (val) => Number(val),
-      z.number().min(0, "Age must be a positive number")
+    price: z.preprocess(
+      (val) => (val === "" ? 0 : Number(val)),
+      z.number().min(0, "Price must be 0 or greater")
     ),
-    origin: z.string().min(1, "Origin is required"), // Nguồn gốc của cá
-    sex: z.string(), // Giới tính của cá
-    foodAmount: z.preprocess(
-      (val) => Number(val),
-      z.number().positive("Food amount must be positive")
+    originalPrice: z.preprocess(
+      (val) => (val === "" ? 0 : Number(val)),
+      z.number().optional()
     ),
-    weight: z.preprocess(
-      (val) => Number(val),
-      z.number().positive("Weight must be positive")
-    ),
-    health: z.string().min(1, "Health status is required"), // Tình trạng sức khỏe
-    dateOfBirth: z.string().min(1, "Date of birth is required"), // Ngày sinh
-  }),
-  fishAward: z
-    .array(
-      z.object({
-        name: z.string().min(1, "Award name is required"), // Tên giải thưởng
-        description: z.string().optional(), // Mô tả giải thưởng
-        awardDate: z.string().min(1, "Award date is required"), // Ngày nhận giải thưởng
-      })
-    )
-    .optional(), // Có thể không bắt buộc (nếu sản phẩm chưa nhận giải)
-});
+    imageFiles: z
+    .array(z.any())
+    .length(3, "Exactly 3 images are required") // Check for exactly 3 images
+    .optional(), // Ảnh sản phẩm, có thể là tệp upload
+    fishModel: z.object({
+      breedId: z.string().min(1, "Breed ID is required"), // Mã giống cá
+      size: z.preprocess(
+        (val) => (val === "" ? 0 : Number(val)),
+        z.number().min(0, "Size must be greater than 0")
+      ),
+      age: z.preprocess(
+        (val) => (val === "" ? 0 : Number(val)),
+        z.number().min(0, "Age must be a positive number")
+      ),
+      origin: z.string().min(1, "Origin is required"), // Nguồn gốc của cá
+      sex: z.string(), // Giới tính của cá
+      foodAmount: z.preprocess(
+        (val) => (val === "" ? 0 : Number(val)),
+        z.number().min(0, "Food amount must be positive")
+      ),
+      weight: z.preprocess(
+        (val) => (val === "" ? 0 : Number(val)),
+        z.number().min(0, "Weight must be positive")
+      ),
+      health: z.string(), // Tình trạng sức khỏe
+      dateOfBirth: z.string(), // Ngày sinh
+    }),
+    fishAward: z
+      .array(
+        z.object({
+          name: z.string().min(1, "Award name is required"), // Tên giải thưởng
+          description: z.string().optional(), // Mô tả giải thưởng
+          awardDate: z.string().min(1, "Award date is required"), // Ngày nhận giải thưởng
+        })
+      )
+      .optional(), // Có thể không bắt buộc (nếu sản phẩm chưa nhận giải)
+  })
+  .refine(
+    (data) => data.price > (data.originalPrice ?? 0), // Ensure price > originalPrice (or 0 if originalPrice is missing)
+    {
+      message: "Price must be greater than the original price",
+      path: ["price"], // Error will be attached to the price field
+    }
+  );
+
 
 const AddProductFishPage = () => {
   const router = useRouter();

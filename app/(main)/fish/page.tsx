@@ -23,6 +23,7 @@ const FishPage = () => {
   const [totalProduct, setTotalProduct] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [loading, setLoading] = useState(false);
+  const [isKoi, setIsKoi] = useState(true);
 
   const router = useRouter();
   useEffect(() => {
@@ -36,8 +37,6 @@ const FishPage = () => {
   const handleGetProduct = async () => {
     setLoading(true);
     try {
-      console.log("page number", pageNumber);
-
       let response = await handleGetProductFishAPI(
         pageSize,
         pageNumber,
@@ -49,7 +48,6 @@ const FishPage = () => {
       if (response?.status === 200) {
         var data = response as AxiosResponse;
         let listporudct = data.data as ProductType[];
-        console.log("listporudct", listporudct);
         setListProductFishes(listporudct);
         setTotalProduct(getTotalCount(response));
         setLoading(false);
@@ -69,6 +67,14 @@ const FishPage = () => {
   const handleChangePage = (opt: number) => {
     setPageNumber(opt + 1);
   };
+
+  const handleOpenAddPage = () => {
+    if (isKoi) {
+      router.push("/fish/addKoi")
+    }else{
+      router.push("/fish/addOther")
+    }
+  }
   return (
     <>
       {loading ? (
@@ -87,7 +93,18 @@ const FishPage = () => {
       ) : (
         <>
           <BackButton text="Go Back" link="/" />
-          <button onClick={(c) => router.push("/fish/add")} className="bg-black text-white font-bold py-2 px-4 rounded text-xs">
+          <select
+                      id="select-filter"
+                      name="select-filter"
+                      className="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-gray-300"
+                      onChange={(e) => {
+                        setIsKoi(e.target.value === 'koi');
+                      }}
+                    >
+                      <option value='koi'>Cá Koi</option>
+                      <option value='other'>Khác</option>
+                    </select>
+          <button onClick={() => handleOpenAddPage()} className="bg-black text-white font-bold py-2 px-4 rounded text-xs">
             Add new product
           </button>
           {listProductFishes && (
@@ -95,6 +112,10 @@ const FishPage = () => {
           )}
           {totalPage > 1 && (
             <div className="list-pagination flex items-center md:mt-10 mt-7">
+              <HandlePagination
+                onPageChange={handleChangePage}
+                pageCount={totalPage}
+              />
             </div>
           )}
         </>

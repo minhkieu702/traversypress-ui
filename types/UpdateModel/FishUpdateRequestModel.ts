@@ -5,10 +5,10 @@ export interface FishUpdateRequestModel {
   size?: number | null;
   age?: number | null;
   origin?: string | null;
-  sex: string;
+  sex?: string | null;
   foodAmount?: number | null;
   weight?: number | null;
   health?: string | null;
-  deleteAward: (string | null)[] | null;
-  fishAward: FishAwardUpdateModel[] | null | undefined; // Allow null or undefined
+  deleteAward?: (string | null)[] | null;
+  fishAward?: FishAwardUpdateModel[] | null | undefined; // Allow null or undefined
 }
