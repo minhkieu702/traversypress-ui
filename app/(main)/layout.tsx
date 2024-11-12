@@ -16,10 +16,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     const decoded = jwtDecode<CustomJwtPayload>(token);
+    console.log(decoded);
+    
     if (decoded.role !== "Admin" && decoded.role !== "Staff") {
       router.push("/auth");
     }
-    if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+    const now = new Date();
+    if (decoded.exp && now.getTime() >= decoded.exp * 1000) {
       router.push("/auth");
     }
   }, []);
