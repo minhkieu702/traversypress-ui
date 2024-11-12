@@ -89,3 +89,18 @@ export const handleGetStaffAPI = async (pageSize?: number, pageNumber?: number, 
     throw new Error(error as string);
   }
 };
+
+export const handleDeleteStaffAPI = async (id: string) => {
+  try {
+    var res = `${baseURL}/v1/admin/staff/${id}`
+    const response = await axios.delete(res, {
+      headers: {
+        Authorization: `Bearer ${jwtToken()}`,
+      }
+    })
+    return response;
+    } catch (error) {
+      handleError(error)
+      throw new Error(error as string);
+    }
+}

@@ -14,15 +14,14 @@ import {
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
 import { ThreeDots } from "react-loader-spinner";
-import { StaffResponseModel } from "@/types/ResponseModel/StaffType";
 import { handleDeleteFeedbackAPI, handleGetFeedbackAPI } from "@/components/api/feedback/feedback";
 import { FeedbackType } from "@/types/ResponseModel/FeedbackType";
 
 const Page = () => {
-  const [listStaff, setListStaff] = useState<FeedbackType[]>([]);
+  const [listFeedback, setListFeedback] = useState<FeedbackType[]>([]);
   const [pageSize, setPageSize] = useState(9);
   const [pageNumber, setPageNumber] = useState(1);
-  const [totalCategories, setTotalCategories] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [loading, setLoading] = useState(false);
 
@@ -33,8 +32,8 @@ const Page = () => {
   }, [pageNumber]);
 
   useEffect(() => {
-    setTotalPage(Math.ceil(totalCategories / pageSize));
-  }, [totalCategories, pageSize]);
+    setTotalPage(Math.ceil(total / pageSize));
+  }, [total, pageSize]);
 
   const handleDeleteItem = async (id: string) => {
     setLoading(true);
@@ -59,7 +58,7 @@ const Page = () => {
     try {
       const response = await handleGetFeedbackAPI(pageSize, pageNumber);
       if (response?.status === 200) {
-        setListStaff(response.data);
+        setListFeedback(response.data);
         getTotalCount(response);
       }      
     } catch (error) {
@@ -74,7 +73,7 @@ const Page = () => {
     if (paginationHeader) {
       const paginationData = JSON.parse(paginationHeader);
       const totalCount = paginationData.TotalCount;
-      setTotalCategories(totalCount);
+      setTotal(totalCount);
     }
   };
 
@@ -103,7 +102,7 @@ const Page = () => {
         <>
           <BackButton text="Go Back" link="/" />
           
-          {listStaff && (
+          {listFeedback && (
             <div className="mt-10">
               <Table>
                 <TableCaption>A list of recent products</TableCaption>
@@ -116,7 +115,7 @@ const Page = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {listStaff.map((product) => (
+                  {listFeedback.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell>{product.productId}</TableCell>
                       <TableCell className="hidden md:table-cell">

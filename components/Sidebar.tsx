@@ -57,6 +57,10 @@ const Sidebar = () => {
             <Folders className='mr-2 h-4 w-4' />
             <Link href='/breed'>Giống Cá</Link>
           </CommandItem>
+          <CommandItem>
+            <PersonStanding className='mr-2 h-4 w-4'/>
+            <Link href='/feedback'>Bình Luận</Link>
+          </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading='Settings'>

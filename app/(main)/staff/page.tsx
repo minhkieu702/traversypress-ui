@@ -13,29 +13,18 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { z } from "zod";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AxiosError, AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import { StaffResponseModel } from "@/types/ResponseModel/StaffType";
-import { handleGetStaffAPI, handlePatchStaffAPI, handlePostStaffAPI } from "@/components/api/person/staff";
+import { handleDeleteStaffAPI, handleGetStaffAPI, handlePatchStaffAPI, handlePostStaffAPI } from "@/components/api/person/staff";
 import { StaffRequestModel } from "@/types/CreateModel/StaffRequestModel";
-import data from "@/data/analytics";
 
 const formSchema = z.object({
   username: z.string().min(1, "required"),
-  fullname: z.string().min(1, "required"),
-  facebook: z.string(),
+  fullname: z.string().min(1, "required")
 });
 const Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -67,7 +56,6 @@ const Page = () => {
     if (staff) {
       console.log("edit", staff)
       setStaff(staff);
-      setValue("facebook", staff.facebook || '');
       setValue("fullname", staff.fullName);
       setValue("username", staff.username);
     } else {
@@ -82,20 +70,20 @@ const Page = () => {
     form.reset();
   };
   const handleDeleteItem = async (id: string) => {
-    // setLoading(true);
-    // try {
-    //   let response = await handleDeleteStaffAPI(id);
-    //   if (response.status === 200) {
-    //     toast({
-    //       title: "Successful",
-    //       description: "Staff was deleted successfully",
-    //     });
-    //   }
-    //   handleGetStaffs();
-    //   setLoading(false);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    setLoading(true);
+    try {
+      let response = await handleDeleteStaffAPI(id);
+      if (response.status === 200) {
+        toast({
+          title: "Successful",
+          description: "Staff was deleted successfully",
+        });
+      }
+      handleGetStaffs();
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -222,11 +210,6 @@ const handleBeAdmin = async (staffId: string) => {
                     placeholder="Enter Full Name"
                     {...form.register("fullname")}
                   />
-                  <input
-                    className="w-full h-30 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                    placeholder="Enter Face Book"
-                    {...form.register("facebook")}
-                  />
                   <div className="flex space-x-4">
                     <Button
                       type="submit"
@@ -272,6 +255,14 @@ const handleBeAdmin = async (staffId: string) => {
                       <TableCell className="hidden md:table-cell">
                         <button onClick={() => handleBeAdmin(product.id)} disabled={product.isAdmin}  className={`py-2 px-4 rounded font-bold ${product.isAdmin ? "bg-gray-400 text-white cursor-not-allowed" : "bg-black text-white"}`}>
                           Update Role
+                        </button>
+                      </TableCell>
+                      <TableCell>
+                        <button
+                          className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
+                          onClick={() => handleDeleteItem(product.id)}
+                        >
+                          Delete
                         </button>
                       </TableCell>
                     </TableRow>
