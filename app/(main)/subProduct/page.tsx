@@ -6,6 +6,7 @@ import HandlePagination from "@/components/Pagination";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "@/components/ui/use-toast";
 import { getTotalCount } from "@/helpers/helpers";
+import { ProductType } from "@/types/ResponseModel/ProductType";
 import { AxiosError, AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
