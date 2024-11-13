@@ -1,14 +1,6 @@
-"use client";
-
-import {
-  handleDeleteCategoryAPI,
-  handleGetCategoryAPI,
-  handlePatchCategoryAPI,
-  handlePostCategoryAPI,
-} from "@/components/api/products/category";
+'use client';
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
-import { CategoryType } from "@/types/ResponseModel/TankCategoryType";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -21,24 +13,18 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { z } from "zod";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AxiosError, AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
+import { StaffResponseModel } from "@/types/ResponseModel/StaffType";
+import { handleDeleteStaffAPI, handleGetStaffAPI, handlePatchStaffAPI, handlePostStaffAPI } from "@/components/api/person/staff";
+import { StaffRequestModel } from "@/types/CreateModel/StaffRequestModel";
 
 const formSchema = z.object({
-  tankType: z.string().min(1, "required"),
-  level: z.string().min(1, "required"),
+  username: z.string().min(1, "required"),
+  fullname: z.string().min(1, "required")
 });
 const Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,86 +32,110 @@ const Page = () => {
   });
 
   const { setValue } = form;
-  const [listCategory, setListCategory] = useState<CategoryType[]>([]);
+  const [listStaff, setListStaff] = useState<StaffResponseModel[]>([]);
   const [pageSize, setPageSize] = useState(9);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalCategories, setTotalCategories] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [popup, setPopup] = useState(false);
-  const [category, setCategory] = useState<CategoryType | null>(null);
+  const [staff, setStaff] = useState<StaffResponseModel | null>(null);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    handleGetCategories();
+    handleGetStaffs();
   }, [pageNumber]);
 
   useEffect(() => {
     setTotalPage(Math.ceil(totalCategories / pageSize));
   }, [totalCategories, pageSize]);
 
-  const handleOpenPopup = (category?: CategoryType) => {
+  const handleOpenPopup = (staff?: StaffResponseModel) => {
     setPopup(true);
-    if (category) {
-      setCategory(category);
-      setValue("level", category.level);
-      setValue("tankType", category.tankType);
+    if (staff) {
+      console.log("edit", staff)
+      setStaff(staff);
+      setValue("fullname", staff.fullName);
+      setValue("username", staff.username);
     } else {
-      setCategory(null);
+      setStaff(null);
       form.reset();
     }
   };
 
   const handleClosePopup = () => {
     setPopup(false);
-    setCategory(null);
+    setStaff(null);
     form.reset();
   };
   const handleDeleteItem = async (id: string) => {
     setLoading(true);
     try {
-      let response = await handleDeleteCategoryAPI(id);
+      let response = await handleDeleteStaffAPI(id);
       if (response.status === 200) {
         toast({
           title: "Successful",
-          description: "Category was deleted successfully",
+          description: "Staff was deleted successfully",
         });
       }
-      handleGetCategories();
+      handleGetStaffs();
       setLoading(false);
     } catch (error) {
       console.log(error);
     }
   };
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setLoading(true);
-    try {
-      const response: AxiosResponse = category
-        ? await handlePatchCategoryAPI(category.id, data)
-        : await handlePostCategoryAPI(data);
-      if (response.status === 200) {
-        toast({
-          title: "Successful",
-          description: category
-            ? `${category.tankType} - ${category.level} updated successfully`
-            : "New category added successfully",
-        });
-        handleClosePopup();
-        handleGetCategories();
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
-  const handleGetCategories = async () => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  setLoading(true);
+  try {
+    const requestModel: StaffRequestModel = {
+      username: data.username,
+      fullName: data.fullname,
+    };
+    
+    // Check if updating or creating a new staff
+    // const response = staff
+    //   ? await handlePatchStaffAPI(staff.id, requestModel)  // Assuming this function exists
+    //   : await handlePostStaffAPI(requestModel);
+const response = await handlePostStaffAPI(requestModel);
+    if (response.status === 200) {
+      toast({
+        title: "Successful",
+        description: `${requestModel.username} - ${requestModel.fullName} added successfully`,
+      });
+      handleClosePopup();
+      handleGetStaffs();
+    }
+  } catch (error) {
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleBeAdmin = async (staffId: string) => {
+  try{
+    var response = await handlePatchStaffAPI(staffId)
+  if (response.status === 200) {
+    toast({
+      title: "Successful",
+      description: `${staffId} is now admin`,
+    });
+    handleClosePopup();
+    handleGetStaffs();
+  }
+} catch (error) {
+} finally {
+  setLoading(false);
+}
+}
+
+  const handleGetStaffs = async () => {
     setLoading(true);
     try {
-      const response = await handleGetCategoryAPI(pageSize, pageNumber);
+      const response = await handleGetStaffAPI(pageSize, pageNumber);
       if (response?.status === 200) {
-        setListCategory(response.data);
+        setListStaff(response.data);
         getTotalCount(response);
         setLoading(false);
       }
@@ -171,14 +181,14 @@ const Page = () => {
             onClick={() => handleOpenPopup()}
             className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
           >
-            Add new category
+            Add new staff
           </button>
           {popup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
               {/* Modal container */}
               <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg mx-4 space-y-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Thêm Loại Hồ Cá</h2>
+                  <h2 className="text-xl font-semibold">Thêm Nhân Viên</h2>
                   <button
                     onClick={handleClosePopup}
                     className="text-gray-400 hover:text-gray-600"
@@ -192,13 +202,13 @@ const Page = () => {
                 >
                   <input
                     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                    placeholder="Enter Level"
-                    {...form.register("level")}
+                    placeholder="Enter User Name"
+                    {...form.register("username")}
                   />
-                  <textarea
+                  <input
                     className="w-full h-30 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                    placeholder="Enter Tank Type"
-                    {...form.register("tankType")}
+                    placeholder="Enter Full Name"
+                    {...form.register("fullname")}
                   />
                   <div className="flex space-x-4">
                     <Button
@@ -220,35 +230,34 @@ const Page = () => {
               </div>
             </div>
           )}
-          {listCategory && (
+          {listStaff && (
             <div className="mt-10">
               <Table>
                 <TableCaption>A list of recent products</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Level</TableHead>
+                    <TableHead>User Name</TableHead>
+                    <TableHead>Full Name</TableHead>
                     <TableHead>Create At</TableHead>
+                    <TableHead>Is Admin</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {listCategory.map((product) => (
+                  {listStaff.map((product) => (
                     <TableRow key={product.id}>
-                      <TableCell>{product.tankType}</TableCell>
+                      <TableCell>{product.username}</TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {product.level}
+                        {product.username}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {product.createdAt}
                       </TableCell>
-                      <TableCell>
-                        <button
-                          className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
-                          onClick={() => handleOpenPopup(product)}
-                        >
-                          Edit
+                      <TableCell className="hidden md:table-cell">
+                        <button onClick={() => handleBeAdmin(product.id)} disabled={product.isAdmin}  className={`py-2 px-4 rounded font-bold ${product.isAdmin ? "bg-gray-400 text-white cursor-not-allowed" : "bg-black text-white"}`}>
+                          Update Role
                         </button>
-                        <>{" "}</>
+                      </TableCell>
+                      <TableCell>
                         <button
                           className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
                           onClick={() => handleDeleteItem(product.id)}

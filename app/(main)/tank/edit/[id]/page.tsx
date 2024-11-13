@@ -25,7 +25,7 @@ import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { AxiosError, AxiosResponse } from "axios";
 import { handleGetCategoryAPI } from "@/components/api/products/category";
-import { CategoryType } from "@/types/ResponseModel/CategoryType";
+import { CategoryType } from "@/types/ResponseModel/TankCategoryType";
 import { ThreeDots } from "react-loader-spinner";
 
 const formSchema = z.object({

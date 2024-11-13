@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  handleDeleteCategoryAPI,
-  handleGetCategoryAPI,
-  handlePatchCategoryAPI,
-  handlePostCategoryAPI,
-} from "@/components/api/products/category";
 import BackButton from "@/components/BackButton";
 import HandlePagination from "@/components/Pagination";
-import { CategoryType } from "@/types/ResponseModel/TankCategoryType";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -21,30 +14,29 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { z } from "zod";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { ThreeDots } from "react-loader-spinner";
+import { CategoryType } from "@/types/ResponseModel/CategoryType";
+import {
+  handleDeleteCategoryAPI,
+  handlePostCategoryAPI,
+  handlePatchCategoryAPI,
+  handleGetCategoryAPI,
+} from "@/components/api/subProduct/category";
+import { CategorySubProductRequestModel } from "@/types/CreateModel/CategorySubProductRequestModel";
 
 const formSchema = z.object({
-  tankType: z.string().min(1, "required"),
-  level: z.string().min(1, "required"),
+  name: z.string().min(1, "required"),
 });
 const Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-
+  const [type, setType] = useState(0);
   const { setValue } = form;
   const [listCategory, setListCategory] = useState<CategoryType[]>([]);
   const [pageSize, setPageSize] = useState(9);
@@ -55,11 +47,13 @@ const Page = () => {
   const [category, setCategory] = useState<CategoryType | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
+  useEffect(() => {
+    setPageNumber(1);
+  }, [type]);
 
   useEffect(() => {
     handleGetCategories();
-  }, [pageNumber]);
+  }, [pageNumber, type]);
 
   useEffect(() => {
     setTotalPage(Math.ceil(totalCategories / pageSize));
@@ -69,8 +63,7 @@ const Page = () => {
     setPopup(true);
     if (category) {
       setCategory(category);
-      setValue("level", category.level);
-      setValue("tankType", category.tankType);
+      setValue("name", category.name);
     } else {
       setCategory(null);
       form.reset();
@@ -101,14 +94,18 @@ const Page = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
+      let requestModel: CategorySubProductRequestModel = {
+        name: data.name,
+        type: type,
+      };
       const response: AxiosResponse = category
-        ? await handlePatchCategoryAPI(category.id, data)
-        : await handlePostCategoryAPI(data);
+        ? await handlePatchCategoryAPI(category.id, requestModel)
+        : await handlePostCategoryAPI(requestModel);
       if (response.status === 200) {
         toast({
           title: "Successful",
           description: category
-            ? `${category.tankType} - ${category.level} updated successfully`
+            ? `${category.name} updated successfully`
             : "New category added successfully",
         });
         handleClosePopup();
@@ -123,7 +120,11 @@ const Page = () => {
   const handleGetCategories = async () => {
     setLoading(true);
     try {
-      const response = await handleGetCategoryAPI(pageSize, pageNumber);
+      const response = await handleGetCategoryAPI(
+        type.toString(),
+        pageSize,
+        pageNumber
+      );
       if (response?.status === 200) {
         setListCategory(response.data);
         getTotalCount(response);
@@ -167,6 +168,18 @@ const Page = () => {
       ) : (
         <>
           <BackButton text="Go Back" link="/" />
+          <select
+            id="select-filter"
+            name="select-filter"
+            className="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-gray-300"
+            onChange={(e) => {
+              setType(e.target.value === "plant" ? 0 : 1);
+            }}
+            value={type === 0 ? "plant" : "tool"}
+          >
+            <option value="plant">Plant</option>
+            <option value="tool">Tool</option>
+          </select>
           <button
             onClick={() => handleOpenPopup()}
             className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
@@ -192,13 +205,8 @@ const Page = () => {
                 >
                   <input
                     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                    placeholder="Enter Level"
-                    {...form.register("level")}
-                  />
-                  <textarea
-                    className="w-full h-30 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                    placeholder="Enter Tank Type"
-                    {...form.register("tankType")}
+                    placeholder="Enter Name"
+                    {...form.register("name")}
                   />
                   <div className="flex space-x-4">
                     <Button
@@ -226,18 +234,14 @@ const Page = () => {
                 <TableCaption>A list of recent products</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Level</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Create At</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {listCategory.map((product) => (
                     <TableRow key={product.id}>
-                      <TableCell>{product.tankType}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {product.level}
-                      </TableCell>
+                      <TableCell>{product.name}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         {product.createdAt}
                       </TableCell>
@@ -248,7 +252,7 @@ const Page = () => {
                         >
                           Edit
                         </button>
-                        <>{" "}</>
+                        <> </>
                         <button
                           className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
                           onClick={() => handleDeleteItem(product.id)}

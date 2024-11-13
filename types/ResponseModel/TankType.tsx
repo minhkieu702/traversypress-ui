@@ -1,5 +1,5 @@
 import { List } from "postcss/lib/list";
-import { CategoryType } from "./CategoryType";
+import { CategoryType } from "./TankCategoryType";
 
 export interface TankType {
     id: string;

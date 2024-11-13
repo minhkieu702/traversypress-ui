@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { handlePostProductFishAPI } from "@/components/api/products/fish";
-import { CategoryType } from "@/types/ResponseModel/CategoryType";
+import { CategoryType } from "@/types/ResponseModel/TankCategoryType";
 import { useToast } from "@/components/ui/use-toast";
 import { AxiosError } from "axios";
 import { handleGetCategoryAPI } from "@/components/api/products/category";

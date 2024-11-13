@@ -11,7 +11,7 @@ import { getTotalCount } from "@/helpers/helpers";
 import { toast } from "@/components/ui/use-toast";
 import { handleGetProductFishAPI } from "@/components/api/products/fish";
 import { handleGetCategoryAPI } from "@/components/api/products/category";
-import { CategoryType } from "@/types/ResponseModel/CategoryType";
+import { CategoryType } from "@/types/ResponseModel/TankCategoryType";
 import { BreedType } from "@/types/ResponseModel/BreedType";
 import { handleGetBreedAPI } from "@/components/api/products/breed";
 import { ThreeDots } from "react-loader-spinner";

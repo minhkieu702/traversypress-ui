@@ -1,6 +1,5 @@
 export interface CategoryType{
-    id: string;
-    tankType: string;
-    level: string;
+    id: string,
+    name: string,
     createdAt: string
 }
