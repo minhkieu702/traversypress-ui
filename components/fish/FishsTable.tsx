@@ -8,7 +8,6 @@ import {
   TableRow,
   TableCaption,
 } from "@/components/ui/table";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface ProductTableProps {
@@ -25,8 +24,10 @@ const ProductTable = ({ data, type }: ProductTableProps) => {
       } else {
         router.push(`/fish/editOther/${data.id}`);
       }
-    } else {
+    } else if(type === "tank") {
       router.push(`/tank/edit/${data.id}`);
+    }else{
+      router.push(`/subProduct/edit/${data.id}`)
     }
   };
   return (

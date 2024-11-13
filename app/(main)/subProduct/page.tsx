@@ -1,5 +1,9 @@
 "use client";
 import { handleGetProductFishAPI } from "@/components/api/products/fish";
+import {
+  handleGetPlantProductAPI,
+  handleGetToolProductAPI,
+} from "@/components/api/subProduct/subProduct";
 import BackButton from "@/components/BackButton";
 import ProductTable from "@/components/fish/FishsTable";
 import HandlePagination from "@/components/Pagination";
@@ -19,12 +23,12 @@ const FishPage = () => {
   const [totalProduct, setTotalProduct] = useState<number>(0);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [loading, setLoading] = useState(false);
-  const [isKoi, setIsKoi] = useState(true);
+  const [isPlant, setIsPlant] = useState(true);
 
   const router = useRouter();
   useEffect(() => {
     handleGetProduct();
-  }, [pageNumber]);
+  }, [pageNumber, isPlant]);
 
   useEffect(() => {
     setTotalPage(Math.ceil(totalProduct / pageSize));
@@ -33,14 +37,23 @@ const FishPage = () => {
   const handleGetProduct = async () => {
     setLoading(true);
     try {
-      let response = await handleGetProductFishAPI(
-        pageSize,
-        pageNumber,
-        null,
-        null,
-        null,
-        null
-      );
+      let response = isPlant
+        ? await handleGetPlantProductAPI(
+            pageSize,
+            pageNumber,
+            null,
+            null,
+            null,
+            null
+          )
+        : await handleGetToolProductAPI(
+            pageSize,
+            pageNumber,
+            null,
+            null,
+            null,
+            null
+          );
       if (response?.status === 200) {
         var data = response as AxiosResponse;
         let listporudct = data.data as ProductType[];
@@ -65,46 +78,48 @@ const FishPage = () => {
   };
 
   const handleOpenAddPage = () => {
-    if (isKoi) {
-      router.push("/fish/addKoi")
-    }else{
-      router.push("/fish/addOther")
-    }
-  }
+    router.push("/subProduct/add");
+  };
   return (
     <>
       {loading ? (
-        <><div className="flex items-center justify-center h-screen">
-        <ThreeDots
-          visible={true}
-          height="80"
-          width="80"
-          color="#000000"
-          radius="9"
-          ariaLabel="three-dots-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-          />
-        </div></>
+        <>
+          <div className="flex items-center justify-center h-screen">
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#000000"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        </>
       ) : (
         <>
           <BackButton text="Go Back" link="/" />
           <select
-                      id="select-filter"
-                      name="select-filter"
-                      className="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-gray-300"
-                      onChange={(e) => {
-                        setIsKoi(e.target.value === 'koi');
-                      }}
-                    >
-                      <option value='koi'>Cá Koi</option>
-                      <option value='other'>Khác</option>
-                    </select>
-          <button onClick={() => handleOpenAddPage()} className="bg-black text-white font-bold py-2 px-4 rounded text-xs">
+            id="select-filter"
+            name="select-filter"
+            className="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-gray-300"
+            value={isPlant ? "plant" : "tool"}
+            onChange={(e) => {
+              setIsPlant(e.target.value === "plant");
+            }}
+          >
+            <option value="plant">Plant</option>
+            <option value="tool">Tool</option>
+          </select>
+          <button
+            onClick={() => handleOpenAddPage()}
+            className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
+          >
             Add new product
           </button>
           {listProductFishes && (
-            <ProductTable data={listProductFishes} type="fish" />
+            <ProductTable data={listProductFishes} type="" />
           )}
           {totalPage > 1 && (
             <div className="list-pagination flex items-center md:mt-10 mt-7">

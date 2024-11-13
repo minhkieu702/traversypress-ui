@@ -70,41 +70,47 @@ const FishPage = () => {
 
   const handleOpenAddPage = () => {
     if (isKoi) {
-      router.push("/fish/addKoi")
-    }else{
-      router.push("/fish/addOther")
+      router.push("/fish/addKoi");
+    } else {
+      router.push("/fish/addOther");
     }
-  }
+  };
   return (
     <>
       {loading ? (
-        <><div className="flex items-center justify-center h-screen">
-        <ThreeDots
-          visible={true}
-          height="80"
-          width="80"
-          color="#000000"
-          radius="9"
-          ariaLabel="three-dots-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
-          />
-        </div></>
+        <>
+          <div className="flex items-center justify-center h-screen">
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#000000"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        </>
       ) : (
         <>
           <BackButton text="Go Back" link="/" />
           <select
-                      id="select-filter"
-                      name="select-filter"
-                      className="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-gray-300"
-                      onChange={(e) => {
-                        setIsKoi(e.target.value === 'koi');
-                      }}
-                    >
-                      <option value='koi'>Cá Koi</option>
-                      <option value='other'>Khác</option>
-                    </select>
-          <button onClick={() => handleOpenAddPage()} className="bg-black text-white font-bold py-2 px-4 rounded text-xs">
+            id="select-filter"
+            name="select-filter"
+            className="caption1 py-2 pl-3 md:pr-20 pr-10 rounded-lg border border-gray-300"
+            value={isKoi ? "koi" : "other"}
+            onChange={(e) => {
+              setIsKoi(e.target.value === "koi");
+            }}
+          >
+            <option value="koi">Cá Koi</option>
+            <option value="other">Khác</option>
+          </select>
+          <button
+            onClick={() => handleOpenAddPage()}
+            className="bg-black text-white font-bold py-2 px-4 rounded text-xs"
+          >
             Add new product
           </button>
           {listProductFishes && (
