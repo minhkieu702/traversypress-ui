@@ -47,7 +47,14 @@ const formSchema = z.object({
     glassType: z.string().min(1, "Glass type is required"), // Nguồn gốc của cá
   }),
   categoriesIds: z.array(z.string()),
-});
+})
+.refine(
+  (data) => data.price > (data.originalPrice ?? 0), // Ensure price > originalPrice (or 0 if originalPrice is missing)
+  {
+    message: "Price must be greater than the original price",
+    path: ["price"], // Error will be attached to the price field
+  }
+);
 
 const AddProductFishPage = () => {
   const router = useRouter();
