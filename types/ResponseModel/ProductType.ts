@@ -1,3 +1,4 @@
+import { CategoryType } from "./CategoryType";
 import { FeedbackType } from "./FeedbackType";
 import { FishType } from "./FishType";
 import { ImageType } from "./ImageType";
@@ -19,5 +20,6 @@ export interface ProductType {
     images: ImageType[]
     fish?: FishType,
     tank?: TankType,
-    quantityPurchase: number
+    quantityPurchase: number,
+    categories: CategoryType[]
 }

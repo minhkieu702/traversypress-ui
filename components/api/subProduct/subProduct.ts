@@ -21,15 +21,25 @@ const updateForm = async (data: SubProductUpdateModel) => {
   if (data.originalPrice)
     formData.append("originalPrice", data.originalPrice.toString());
   formData.append("type", data.type.toString());
+  if(data.deleteCategories){
+    data.deleteCategories.forEach((string, index) => {
+      if (string) formData.append(`deleteCategories[${index}]`, string);
+    });
+  }
+  if(data.updateCategories){
+    data.updateCategories.forEach((string, index) => {
+      if (string) formData.append(`updateCategories[${index}]`, string);
+    });
+  }
   if (data.deleteImages) {
     data.deleteImages.forEach((string, index) => {
       if (string) formData.append(`deleteImages[${index}]`, string);
     });
-    if (data.updateImages) {
-      data.updateImages.forEach((file, index) => {
-        formData.append(`updateImages${index}`, file);
-      });
-    }
+  }
+  if (data.updateImages) {
+    data.updateImages.forEach((file, index) => {
+      formData.append(`updateImages${index}`, file);
+    });
   }
   return formData;
 };
@@ -143,6 +153,8 @@ export const hanldePatchSubProductAPI = async (
   id: string,
   data: SubProductUpdateModel
 ) => {
+  console.log(data);
+  
   try {
     let formData = await updateForm(data);
     var res = `${baseURL}/v1/product/${id}`;
