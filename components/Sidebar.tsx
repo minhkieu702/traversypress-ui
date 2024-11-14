@@ -43,6 +43,10 @@ const Sidebar = () => {
           </CommandItem>
           <CommandItem>
             <RectangleHorizontal className='mr-2 h-4 w-4' />
+            <Link href='/subProduct'>Sản Phẩm Phụ</Link>
+          </CommandItem>
+          <CommandItem>
+            <RectangleHorizontal className='mr-2 h-4 w-4' />
             <Link href='/tank'>Hồ Cá</Link>
           </CommandItem>
           <CommandItem>
