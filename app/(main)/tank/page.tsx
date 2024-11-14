@@ -33,8 +33,6 @@ const TankPage = () => {
     const handleGetProduct = async () => {
         setLoading(true)
         try {
-            console.log("page number", pageNumber);
-            
             let response = await handleGetProductTankAPI(pageSize, pageNumber, null, null, null, null)
         if (response?.status === 200) {
             var data = response as AxiosResponse

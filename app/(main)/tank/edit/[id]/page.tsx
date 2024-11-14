@@ -50,8 +50,8 @@ const formSchema = z.object({
     size: z.string().min(1, "Size is required"),
     sizeInformation: z.string().min(1, "Size information is required"),
     glassType: z.string().min(1, "Glass type is required"),
-    deleteCategories: z.array(z.string().uuid()),
-    updateCategories: z.array(z.string().uuid()),
+    deleteCategories: z.array(z.string().uuid()).optional(),
+    updateCategories: z.array(z.string().uuid()).optional(),
   }),
 });
 
@@ -70,17 +70,8 @@ const EditTankProductPage = ({ params }: EditTankProductPageProps) => {
   const [deleteImages, setDeleteImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    // defaultValues:{
-    //     tankModel.updateCategories: [],
-    //     tankModel.deleteCategories: [],
-    // }
+    resolver: zodResolver(formSchema)
   });
-
-  //   const { fields, append, remove } = useFieldArray({
-  //     control: form.control,
-  //     name: "tankModel.tankAward",
-  //   });
 
   const { setValue } = form;
 
