@@ -46,6 +46,7 @@ const formSchema = z
       .optional(), // Ảnh sản phẩm, có thể là tệp upload
     fishModel: z.object({
       breedId: z.string().min(1, "Breed ID is required"), // Mã giống cá
+      origin: z.string().min(1, "Origin is required"), // Nguồn gốc của cá
     }),
   })
   .refine(
@@ -66,7 +67,7 @@ const page = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-  })
+  });
 
   useEffect(() => {
     handleGetBreed();
@@ -289,7 +290,25 @@ const page = () => {
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={form.control}
+                name="fishModel.origin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                      Origin
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                        placeholder="Enter Origin"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {/* Fish Model */}
               <FormField
                 control={form.control}

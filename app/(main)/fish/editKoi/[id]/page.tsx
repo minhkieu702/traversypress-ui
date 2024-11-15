@@ -70,6 +70,7 @@ const formSchema = z.object({
       z.number().positive("Weight must be positive")
     ),
     health: z.string().min(1, "Health status is required"),
+    dateOfBirth: z.string(),
     deleteAward: z.array(z.string().uuid()).optional(),
     fishAward: z
       .array(
@@ -192,6 +193,7 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
           setValue("fishModel.foodAmount", fish.fish.foodAmount);
         if (fish.fish.weight) setValue("fishModel.weight", fish.fish.weight);
         if (fish.fish.health) setValue("fishModel.health", fish.fish.health);
+        if (fish.fish.dateOfBirth) setValue("fishModel.dateOfBirth", fish.fish.dateOfBirth)
       }
     }
     setLoading(false)
@@ -606,7 +608,25 @@ const EditFishProductPage = ({ params }: EditFishProductPageProps) => {
               </FormItem>
             )}
           />
-
+<FormField
+            control={form.control}
+            name="fishModel.dateOfBirth"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
+                  Date of Birth
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="fishModel.health"

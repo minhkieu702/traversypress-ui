@@ -9,6 +9,7 @@ export interface FishUpdateRequestModel {
   foodAmount?: number | null;
   weight?: number | null;
   health?: string | null;
+  dateOfBirth?: string|null;
   deleteAward?: (string | null)[] | null;
   fishAward?: FishAwardUpdateModel[] | null | undefined; // Allow null or undefined
 }

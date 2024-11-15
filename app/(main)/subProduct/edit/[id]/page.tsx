@@ -205,27 +205,6 @@ const Page = ({ params }: EditTankProductPageProps) => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <>
 
-{/* Name */}
-<FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                        Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0"
-                          placeholder="Enter Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 {/* Name */}
                 <FormField
                   control={form.control}

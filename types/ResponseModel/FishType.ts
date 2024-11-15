@@ -3,7 +3,7 @@ import { BreedType } from "./BreedType";
 
 export interface FishType {
     id:string;
-    product_id?: string;
+    productId?: string;
     breed: BreedType;
     size?: number;
     age?: number;
@@ -12,6 +12,6 @@ export interface FishType {
     foodAmount?: number;
     weight?: number;
     health?: string;
-    date_of_birth?: string;
+    dateOfBirth?: string;
     awards?:AwardType[]
 }

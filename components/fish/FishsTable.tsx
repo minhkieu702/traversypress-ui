@@ -19,7 +19,7 @@ const ProductTable = ({ data, type }: ProductTableProps) => {
   const router = useRouter();
   const handleOpenEditPage = (data: ProductType) => {
     if (type === "fish") {
-      if (data.fish?.date_of_birth) {
+      if (data.fish?.dateOfBirth) {
         router.push(`/fish/editKoi/${data.id}`);
       } else {
         router.push(`/fish/editOther/${data.id}`);

@@ -67,6 +67,7 @@ const updateForm = async (data: FishProductUpdateModel) => {
       foodAmount: data.fishModel.foodAmount,
       weight: data.fishModel.weight,
       health: data.fishModel.health,
+      dateOfBirth: data.fishModel.dateOfBirth,
       deleteAward: data.fishModel.deleteAward,
       fishAward: fishAward
     }
@@ -175,6 +176,8 @@ export const handleGetProductFishByIdAPI = async (id: string) => {
         Authorization: `Bearer ${jwtToken()}`,
       }
     });
+    console.log(response);
+    
     return response;
   } catch (error) {
     handleError(error)
@@ -188,6 +191,7 @@ export const hanldePatchProductFishAPI = async (
 ) => {
   try {
     let formData = await updateForm(data);
+    logFormData(formData)
     var res = `${baseURL}/v1/product/fish/${id}`;
     const response = await axios.patch(res, formData, {
       headers: {
